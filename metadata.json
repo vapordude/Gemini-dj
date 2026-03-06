@@ -1,0 +1,5 @@
+{
+  "name": "Gemini DJ - SOTA Music Orchestrator",
+  "description": "A world-class, Python-free AI DJ application. Features dual-deck audio mixing, intelligent track selection via Gemini, and high-fidelity TTS commentary. Built with React, Node.js, and Web Audio API.",
+  "requestFramePermissions": []
+}

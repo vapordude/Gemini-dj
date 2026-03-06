@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --animate-spin-slow: spin 3s linear infinite;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  /* Custom Colors */
+  --color-deck-base: #09090b; /* zinc-950 */
+  --color-deck-surface: #18181b; /* zinc-900 */
+  --color-deck-highlight: #27272a; /* zinc-800 */
+  --color-accent-primary: #6366f1; /* indigo-500 */
+  --color-accent-secondary: #a855f7; /* purple-500 */
+  --color-accent-danger: #ef4444; /* red-500 */
+  --color-accent-success: #10b981; /* emerald-500 */
+}
+
+/* Custom Utilities */
+@layer utilities {
+  .glass-panel {
+    @apply bg-zinc-900/80 backdrop-blur-xl border border-white/5 shadow-xl;
+  }
+  
+  .neon-text {
+    text-shadow: 0 0 10px currentColor;
+  }
+  
+  .knob-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  }
+
+  .deck-surface {
+    background-image: radial-gradient(circle at center, #27272a 0%, #18181b 100%);
+  }
+  
+  /* Custom Scrollbar */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-zinc-900;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-zinc-700 rounded-full hover:bg-zinc-600;
+  }
+}
