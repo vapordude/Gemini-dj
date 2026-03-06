@@ -8,15 +8,6 @@
 
 /* Global variables for POC */
 static ma_engine ma_eng;
-static ma_sound deck_a_sound;
-
-void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
-{
-    (void)pDevice; /* Unused */
-    /* Use the miniaudio engine to mix and output to the device */
-    ma_engine_read_pcm_frames(&ma_eng, pOutput, frameCount, NULL);
-    (void)pInput; /* Unused */
-}
 
 int audio_engine_init(audio_engine_t* engine) {
     if (engine == NULL) return -1;
@@ -42,7 +33,19 @@ int audio_engine_init(audio_engine_t* engine) {
 
 void audio_engine_cleanup(audio_engine_t* engine) {
     if (engine && engine->initialized) {
-        ma_sound_uninit(&deck_a_sound);
+        if (engine->deck_a._internal_sound) {
+            ma_sound_uninit((ma_sound*)engine->deck_a._internal_sound);
+            free(engine->deck_a._internal_sound);
+        }
+        if (engine->deck_b._internal_sound) {
+            ma_sound_uninit((ma_sound*)engine->deck_b._internal_sound);
+            free(engine->deck_b._internal_sound);
+        }
+        if (engine->deck_voice._internal_sound) {
+            ma_sound_uninit((ma_sound*)engine->deck_voice._internal_sound);
+            free(engine->deck_voice._internal_sound);
+        }
+
         ma_engine_uninit((ma_engine*)engine->_internal_engine);
         engine->initialized = false;
         printf("[Audio Engine] Cleaned up.\n");
@@ -64,15 +67,24 @@ int audio_deck_load(deck_t* deck, const char* source) {
      */
     printf("[Audio Deck] Loading source: %s\n", source);
 
-    result = ma_sound_init_from_file(&ma_eng, source, 0, NULL, NULL, &deck_a_sound);
+    /* Clean up existing sound if reloading */
+    if (deck->_internal_sound) {
+        ma_sound_uninit((ma_sound*)deck->_internal_sound);
+        free(deck->_internal_sound);
+        deck->_internal_sound = NULL;
+    }
+
+    ma_sound* new_sound = (ma_sound*)malloc(sizeof(ma_sound));
+    if (!new_sound) return -1;
+
+    result = ma_sound_init_from_file(&ma_eng, source, 0, NULL, NULL, new_sound);
     if (result != MA_SUCCESS) {
         printf("[Audio Deck] Failed to load sound: %s (Error: %d)\n", source, result);
-        /* If it fails, we assume it's because the file isn't there in POC.
-         * We won't crash, just report error. */
+        free(new_sound);
         return -1;
     }
 
-    deck->_internal_sound = &deck_a_sound;
+    deck->_internal_sound = new_sound;
     deck->state = DECK_STOPPED;
     deck->volume = 1.0f;
     printf("[Audio Deck] Loaded successfully.\n");
@@ -88,6 +100,14 @@ void audio_deck_play(deck_t* deck) {
     }
 }
 
+void audio_deck_pause(deck_t* deck) {
+    if (deck && deck->_internal_sound) {
+        ma_sound_stop((ma_sound*)deck->_internal_sound);
+        deck->state = DECK_PAUSED;
+        printf("[Audio Deck] Paused.\n");
+    }
+}
+
 void audio_deck_stop(deck_t* deck) {
     if (deck && deck->_internal_sound) {
         ma_sound_stop((ma_sound*)deck->_internal_sound);
@@ -95,6 +115,18 @@ void audio_deck_stop(deck_t* deck) {
         deck->state = DECK_STOPPED;
         printf("[Audio Deck] Stopped.\n");
     }
+}
+
+void audio_deck_set_volume(deck_t* deck, float volume) {
+    if (deck && deck->_internal_sound) {
+        ma_sound_set_volume((ma_sound*)deck->_internal_sound, volume);
+        deck->volume = volume;
+    }
+}
+
+void audio_mixer_auto_transition(audio_engine_t* engine, int duration_ms) {
+    if (!engine) return;
+    printf("[Mixer] Auto transition not fully implemented in POC (Duration: %d ms)\n", duration_ms);
 }
 
 void audio_mixer_set_crossfader(audio_engine_t* engine, float pos) {

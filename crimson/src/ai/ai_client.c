@@ -55,3 +55,23 @@ int ai_generate_dj_commentary(ai_client_t* client,
     printf("[AI Client] Generated Commentary: %s\n", out_buffer);
     return 0;
 }
+
+int ai_generate_tts(ai_client_t* client, const char* text, const char* out_filepath) {
+    if (!client || !client->initialized || !text || !out_filepath) return -1;
+
+    printf("[AI Client] Generating TTS for text: \"%s\" to %s\n", text, out_filepath);
+    /* Stub for POC */
+    return 0;
+}
+
+int ai_analyze_track_metadata(ai_client_t* client,
+                              const char* track_title,
+                              const char* artist,
+                              char* out_json,
+                              int out_size) {
+    if (!client || !client->initialized || !out_json) return -1;
+
+    printf("[AI Client] Analyzing track: %s by %s\n", track_title, artist);
+    snprintf(out_json, out_size, "{\"bpm\": 120, \"key\": \"C Minor\"}");
+    return 0;
+}

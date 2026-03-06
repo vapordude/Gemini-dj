@@ -38,7 +38,7 @@ typedef struct {
     audio_track_t current_track;
     float volume;        /* 0.0 to 1.0 */
     float pitch;         /* Playback speed (1.0 = normal) for beatmatching */
-    void* _internal_sound; /* Pointer to miniaudio sound object */
+    void* _internal_sound; /* Pointer to miniaudio sound object (allocated dynamically) */
 } deck_t;
 
 /**

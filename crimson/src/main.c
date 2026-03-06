@@ -1,4 +1,5 @@
 #include "core/audio_engine.h"
+#define _XOPEN_SOURCE 500
 #include "ai/ai_client.h"
 #include <stdio.h>
 #include <unistd.h>
