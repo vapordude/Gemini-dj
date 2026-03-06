@@ -54,16 +54,28 @@ To achieve the "SOTA AI DJ" that is stable, highly optimized, and capable of run
 
 ### Architecture Enhancements (The "AI DJ" SOTA Features)
 
-*   **Real-time Beatmatching/Analysis:** Instead of relying on an LLM to "guess" BPM/Key, the C engine will utilize a lightweight DSP library (like `aubio` (GPL - maybe too restrictive?) or a custom permissive onset detector) to calculate true BPM and phase, allowing for automatic, synchronized crossfading.
+*   **Real-time Beatmatching/Analysis:** Instead of relying on an LLM to "guess" BPM/Key, the C engine will utilize pure C DSP libraries like **minibpm (MIT)** or **BTrack (MIT)** for tempo estimation, and **kissfft (BSD)** for chromagram-based key detection.
+*   **Stem Separation (Source Masking):** To achieve true SOTA AI DJing (like isolating vocals for a mashup), we will integrate the **ONNX Runtime C API (MIT)** to run highly-optimized models like **Demucs v4** locally, splitting tracks into stems within the engine.
 *   **Multi-Deck Node Graph:** `miniaudio` allows creating a routing graph. We will implement:
-    *   Node: Deck A Stream
-    *   Node: Deck B Stream
+    *   Node: Deck A Stream (with child stem nodes)
+    *   Node: Deck B Stream (with child stem nodes)
     *   Node: TTS/DJ Voice Stream
     *   Node: FX Chain (Lowpass/Highpass filters for transitions)
-*   **Local AI Fallback:** Abstract the AI client so it can dynamically point to `localhost:11434` (Ollama) if Gemini fails or the user prefers full local FOSS execution.
+*   **Local FOSS AI Stack (The "Autodiscovery" Layer):**
+    *   **LLM:** Llama-3.1-8B, Qwen2.5-1.5B, or Phi-3-Mini running via a local `llama.cpp` server.
+    *   **TTS:** **Piper TTS** or **Kokoro-82M** for ultra-fast, local, expressive voice generation.
 *   **Headless Daemon Mode:** The C engine can run completely headless, outputting audio directly to a Raspberry Pi's DAC, controlled purely via REST API or websockets.
 
-## 3. System Design Map
+## 3. Minimum System Requirements
+
+*   **Cloud API Mode (Gemini/Remote):**
+    *   **Hardware:** Raspberry Pi 3/4, Mobile Device, or Low-end VPS.
+    *   **RAM:** < 512MB (C Engine idles at ~20MB).
+*   **Full Local SOTA Mode (On-device LLM + TTS + DSP):**
+    *   **Hardware:** Raspberry Pi 5 (8GB) or modern x64 / Apple Silicon.
+    *   **RAM:** 8GB Minimum (4GB LLM, 1GB TTS, 2GB OS/Audio Buffers).
+
+## 4. System Design Map
 
 \`\`\`
 [Frontend Web App (React)]  <-- HTTP/WebSocket -->  [Civetweb API Server (C)]
