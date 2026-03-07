@@ -8,8 +8,8 @@ interface MixerProps {
 export function Mixer({ crossfader, onCrossfaderChange }: MixerProps) {
   return (
     <div className="glass-panel rounded-2xl p-4 border-t border-white/10 shadow-2xl flex flex-col items-center justify-center h-full relative overflow-hidden bg-zinc-900/90">
-      {/* Texture */}
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-20 pointer-events-none mix-blend-overlay" />
+      {/* Subtle noise texture via CSS — no external CDN */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:4px_4px]" />
       
       <div className="relative z-10 flex flex-col items-center w-full h-full justify-between py-4">
           <div className="flex flex-col items-center gap-1">
