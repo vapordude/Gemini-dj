@@ -131,23 +131,6 @@ export function useAudioDeck(initialVolume = 1.0) {
 
   // ... (FX Controls)
 
-  return {
-    state,
-    loadTrack,
-    play,
-    pause,
-    setVolume,
-    seek,
-    setFilter,
-    setEQ,
-    setDelay,
-    triggerFX,
-    setPlaybackRate,
-    toggleLoop
-  };
-}
-
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   
@@ -259,19 +242,6 @@ export function useAudioDeck(initialVolume = 1.0) {
       audio.removeEventListener('ended', onEnded);
     };
   }, [engine.context]);
-
-  const loadTrack = (track: Track) => {
-    if (!audioRef.current) return;
-    
-    engine.init();
-    engine.resume();
-
-    const streamUrl = `/api/stream/${track.id}`;
-    audioRef.current.src = streamUrl;
-    audioRef.current.load();
-    
-    setState(prev => ({ ...prev, track, isPlaying: false, currentTime: 0 }));
-  };
 
   const play = () => {
     if (audioRef.current) {
