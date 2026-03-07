@@ -23,10 +23,12 @@ int main() {
     // 2. Initialize AI Client (Full Sovereign Mode config)
     ai::AIConfig config{
         .api_key = "",
-        .base_url = "http://localhost:11434",
+        .base_url = "http://localhost:11434", // Local Llama.cpp / Ollama
         .llm_model = "llama3.2:3b",
         .tts_model = "kokoro-82m",
-        .use_local_network = true
+        .use_local_network = true,
+        .local_model_path = "",
+        .ace_step_model_path = ""
     };
     ai::AIClient ai(std::move(config));
 
@@ -57,9 +59,12 @@ int main() {
     // 4. Simulate AI DJ Workflow
     std::cout << "\n--- Simulating AI DJ Transition ---\n";
 
-    engine.getDeckA().load("dummy_track_a.mp3", engine.getInternalEngine());
+    engine.getDeckA().attachEngine(engine.getInternalEngine());
+    engine.getDeckA().load("dummy_track_a.mp3"); // Real miniaudio decoding attempts
 
+    // Generate real DJ commentary via REST API to Ollama
     if (auto commentary = ai.generateDJCommentary("Cyberpunk Beats", "Synthwave Drive", "high energy")) {
+        std::cout << "[AI DJ Speak]: \"" << *commentary << "\"\n";
         ai.generateTTS(*commentary, "/tmp/dj_voice.wav");
     }
 
@@ -73,7 +78,6 @@ int main() {
 
     engine.getDeckA().stop();
 
-    // RAII handles cleanup naturally, but explicit shutdown is good practice
     std::cout << "\nShutting down engine...\n";
     ai.shutdown();
     engine.shutdown();

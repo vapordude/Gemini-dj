@@ -2,6 +2,7 @@
 
 #include "Deck.hpp"
 #include <memory>
+#include <atomic>
 
 namespace crimson::audio {
 
@@ -18,16 +19,18 @@ public:
 
     Deck& getDeckA() { return *deck_a_; }
     Deck& getDeckB() { return *deck_b_; }
-    Deck& getDeckVoice() { return *deck_voice_; }
+    Deck& getVoiceDeck() { return *deck_voice_; }
 
     void setCrossfader(float pos);
+    float getCrossfader() const { return crossfader_.load(); }
+
     void autoTransition(int duration_ms);
 
     [[nodiscard]] void* getInternalEngine() const { return internal_engine_; }
 
 private:
     bool initialized_{false};
-    float crossfader_{0.0f}; // -1.0 (A) to 1.0 (B)
+    std::atomic<float> crossfader_{0.0f}; // -1.0 (A) to 1.0 (B)
 
     std::unique_ptr<Deck> deck_a_;
     std::unique_ptr<Deck> deck_b_;

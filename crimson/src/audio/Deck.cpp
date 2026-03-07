@@ -1,7 +1,7 @@
 #include "crimson/audio/Deck.hpp"
 #include "crimson/audio/miniaudio.h"
 #include <iostream>
-#include <stdexcept>
+#include <algorithm> // for std::clamp
 
 namespace crimson::audio {
 
@@ -18,8 +18,18 @@ Deck::~Deck() {
     }
 }
 
-bool Deck::load(const std::string& source, void* engine_ptr) {
+void Deck::attachEngine(void* engine) {
+    engine_ = engine;
+}
+
+bool Deck::load(const std::string& source) {
     std::cout << "[Deck " << id_ << "] Loading: " << source << "\n";
+
+    if (!engine_) {
+        std::cerr << "[Deck " << id_ << "] Error: No engine attached!\n";
+        status_ = DeckStatus::Error;
+        return false;
+    }
 
     // Cleanup previous sound if reloading
     if (status_ != DeckStatus::Stopped && status_ != DeckStatus::Error) {
@@ -27,15 +37,11 @@ bool Deck::load(const std::string& source, void* engine_ptr) {
         ma_sound_uninit(static_cast<ma_sound*>(internal_sound_));
     }
 
-    if (!engine_ptr) {
-        status_ = DeckStatus::Error;
-        return false;
-    }
-
+    // Load asynchronously from stream using MA_SOUND_FLAG_STREAM
     ma_result result = ma_sound_init_from_file(
-        static_cast<ma_engine*>(engine_ptr),
+        static_cast<ma_engine*>(engine_),
         source.c_str(),
-        0,
+        MA_SOUND_FLAG_STREAM | MA_SOUND_FLAG_DECODE,
         nullptr,
         nullptr,
         static_cast<ma_sound*>(internal_sound_)
@@ -70,7 +76,7 @@ void Deck::pause() {
 }
 
 void Deck::stop() {
-    if (internal_sound_) {
+    if (internal_sound_ && status_ != DeckStatus::Stopped && status_ != DeckStatus::Error) {
         ma_sound_stop(static_cast<ma_sound*>(internal_sound_));
         ma_sound_seek_to_pcm_frame(static_cast<ma_sound*>(internal_sound_), 0);
         status_ = DeckStatus::Stopped;
@@ -79,10 +85,18 @@ void Deck::stop() {
 }
 
 void Deck::setVolume(float volume) {
+    volume_ = std::clamp(volume, 0.0f, 1.0f);
     if (internal_sound_) {
-        ma_sound_set_volume(static_cast<ma_sound*>(internal_sound_), volume);
+        ma_sound_set_volume(static_cast<ma_sound*>(internal_sound_), volume_);
     }
-    volume_ = volume;
+}
+
+void Deck::setStemMix(float drums, float bass, float other, float vocals) {
+    stem_mix_[0] = drums;
+    stem_mix_[1] = bass;
+    stem_mix_[2] = other;
+    stem_mix_[3] = vocals;
+    // TODO: Apply to Demucs separated ONNX stems node
 }
 
 } // namespace crimson::audio

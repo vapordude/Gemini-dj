@@ -1,80 +1,89 @@
 #pragma once
-
 #include <atomic>
 #include <vector>
 #include <cstddef>
-#include <cassert>
+#include <new>
 
 namespace crimson::core {
 
 /**
- * Single-Producer Single-Consumer (SPSC) Lock-Free Ring Buffer.
- * Crucial for the audio pipeline to prevent audio dropouts (under-runs)
- * when piping yt-dlp stdout into miniaudio on the SCHED_FIFO thread.
+ * Lock-free Single-Producer Single-Consumer Ring Buffer
+ * Power-of-2 sized for fast modulo via bitwise AND
+ * Used for: Audio decoder thread -> Audio callback thread
  */
-template <typename T>
+template<typename T>
 class RingBuffer {
 public:
-    explicit RingBuffer(size_t size) : size_(nextPowerOfTwo(size)), buffer_(size_) {
-        read_index_.store(0, std::memory_order_relaxed);
-        write_index_.store(0, std::memory_order_relaxed);
+    explicit RingBuffer(size_t capacity)
+        : size_(nextPowerOf2(capacity))
+        , mask_(size_ - 1)
+        , buffer_(static_cast<T*>(::operator new[](sizeof(T) * size_, std::align_val_t{alignof(T)})))
+        , head_(0)
+        , tail_(0)
+    {}
+
+    ~RingBuffer() {
+        // Cleanup any remaining elements
+        T item;
+        while (pop(item)) {}
+        ::operator delete[](buffer_, std::align_val_t{alignof(T)});
     }
 
+    // Producer only (Decoder thread)
     bool push(const T& item) {
-        size_t write_pos = write_index_.load(std::memory_order_relaxed);
-        size_t next_write_pos = (write_pos + 1) & (size_ - 1);
+        const size_t current_head = head_.load(std::memory_order_relaxed);
+        const size_t next_head = (current_head + 1) & mask_;
 
-        if (next_write_pos == read_index_.load(std::memory_order_acquire)) {
-            return false; // Buffer is full
+        if (next_head == tail_.load(std::memory_order_acquire)) {
+            return false; // Full
         }
 
-        buffer_[write_pos] = item;
-        write_index_.store(next_write_pos, std::memory_order_release);
+        new (&buffer_[current_head]) T(item);
+        head_.store(next_head, std::memory_order_release);
         return true;
     }
 
-    bool pop(T& out_item) {
-        size_t read_pos = read_index_.load(std::memory_order_relaxed);
+    // Consumer only (Audio thread - SCHED_FIFO)
+    bool pop(T& item) {
+        const size_t current_tail = tail_.load(std::memory_order_relaxed);
 
-        if (read_pos == write_index_.load(std::memory_order_acquire)) {
-            return false; // Buffer is empty
+        if (current_tail == head_.load(std::memory_order_acquire)) {
+            return false; // Empty
         }
 
-        out_item = buffer_[read_pos];
-        read_index_.store((read_pos + 1) & (size_ - 1), std::memory_order_release);
+        item = buffer_[current_tail];
+        buffer_[current_tail].~T();
+        tail_.store((current_tail + 1) & mask_, std::memory_order_release);
         return true;
     }
 
-    [[nodiscard]] size_t size() const {
-        return size_;
-    }
+    size_t size() const { return size_; }
 
-    [[nodiscard]] size_t available() const {
-        size_t write_pos = write_index_.load(std::memory_order_acquire);
-        size_t read_pos = read_index_.load(std::memory_order_acquire);
-        return (write_pos - read_pos) & (size_ - 1);
+    bool empty() const {
+        return head_.load(std::memory_order_acquire) ==
+               tail_.load(std::memory_order_acquire);
     }
 
 private:
-    static size_t nextPowerOfTwo(size_t v) {
-        v--;
-        v |= v >> 1;
-        v |= v >> 2;
-        v |= v >> 4;
-        v |= v >> 8;
-        v |= v >> 16;
-        // Prevent undefined behavior on 32-bit systems (where size_t is 32 bits)
-        if constexpr (sizeof(size_t) > 4) {
-            v |= v >> 32;
+    static size_t nextPowerOf2(size_t n) {
+        n--;
+        n |= n >> 1;
+        n |= n >> 2;
+        n |= n >> 4;
+        n |= n >> 8;
+        n |= n >> 16;
+        if constexpr (sizeof(size_t) == 8) {
+            n |= n >> 32;
         }
-        v++;
-        return v;
+        return n + 1;
     }
 
-    size_t size_;
-    std::vector<T> buffer_;
-    alignas(64) std::atomic<size_t> read_index_{0};  // Prevent false sharing
-    alignas(64) std::atomic<size_t> write_index_{0};
+    const size_t size_;
+    const size_t mask_;
+    T* const buffer_;
+
+    alignas(64) std::atomic<size_t> head_; // Producer writes
+    alignas(64) std::atomic<size_t> tail_; // Consumer reads (cache line separation)
 };
 
 } // namespace crimson::core

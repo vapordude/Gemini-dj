@@ -29,11 +29,16 @@ public:
     Deck(const Deck&) = delete;
     Deck& operator=(const Deck&) = delete;
 
-    bool load(const std::string& source, void* engine_ptr);
+    void attachEngine(void* engine);
+
+    bool load(const std::string& source);
     void play();
     void pause();
     void stop();
     void setVolume(float volume);
+
+    // Stem mix levels for Demucs integration (future)
+    void setStemMix(float drums, float bass, float other, float vocals);
 
     [[nodiscard]] int getId() const { return id_; }
     [[nodiscard]] float getVolume() const { return volume_; }
@@ -49,7 +54,10 @@ private:
     float volume_{1.0f};
     float pitch_{1.0f};
 
-    void* internal_sound_{nullptr};
+    float stem_mix_[4] = {1.0f, 1.0f, 1.0f, 1.0f}; // drums, bass, other, vocals
+
+    void* internal_sound_{nullptr}; // ma_sound
+    void* engine_{nullptr};         // ma_engine reference
 };
 
 } // namespace crimson::audio
