@@ -145,6 +145,8 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
         <div className="col-span-1 flex items-center justify-center">
           <button
             onClick={isPlaying ? controls.pause : controls.play}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+            title={isPlaying ? 'Pause' : 'Play'}
             className={`w-full h-full rounded-xl flex items-center justify-center transition-all shadow-xl border ${
               isPlaying
                 ? 'bg-zinc-900 text-red-500 border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
@@ -188,6 +190,8 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
               <label className="text-[7px] font-bold text-zinc-500 uppercase mb-1">FILTER</label>
               <input
                 type="range" min="20" max="22000" step="100" value={filterFreq}
+                aria-label="Filter"
+                title="Filter"
                 className="w-full h-1 bg-zinc-700 rounded-full appearance-none accent-yellow-500"
                 onChange={e => controls.setFilter(Number(e.target.value))}
               />
@@ -196,6 +200,8 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
               <label className="text-[7px] font-bold text-zinc-500 uppercase mb-1">ECHO</label>
               <input
                 type="range" min="0" max="1" step="0.1" value={delayWet}
+                aria-label="Echo"
+                title="Echo"
                 className="w-full h-1 bg-zinc-700 rounded-full appearance-none accent-cyan-500"
                 onChange={e => controls.setDelay(Number(e.target.value))}
               />
@@ -213,6 +219,8 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
                   <input
                     type="range" min="-20" max="10" step="1"
                     value={state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number}
+                    aria-label={`EQ ${band}`}
+                    title={`EQ ${band}`}
                     className="absolute inset-0 opacity-0 cursor-pointer"
                     onChange={e => controls.setEQ(band, Number(e.target.value))}
                     onDoubleClick={() => controls.setEQ(band, 0)}
