@@ -1,0 +1,3 @@
+## 2024-05-15 - Icon-only buttons lacking context
+**Learning:** Icon-only buttons (like the AI Chat toggle and Deck play/pause buttons) create a significant accessibility barrier as they lack descriptive text for screen readers. Providing robust disabled states with visual feedback for async forms prevents confusion.
+**Action:** Always add descriptive `aria-label` attributes to icon-only interactive elements and pair them with `focus-visible` to ensure proper keyboard navigation visibility. For stateful buttons, provide clear visual and screen-reader cues (`disabled:opacity`, `aria-expanded`, `aria-pressed`).
