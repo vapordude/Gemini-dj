@@ -1,0 +1,3 @@
+## 2024-05-24 - AI DJ Chat UI Component Polish
+**Learning:** This app's neon, glassmorphism UI often overlooks focus states (`focus-visible`) and `aria-label`s on icon-only buttons, especially in new interactive components like `DJChat.tsx`.
+**Action:** Ensure that all floating action buttons (like the chat toggle) and icon-only modal buttons (like close and send) receive explicit `aria-label` attributes and keyboard focus indicators (`focus-visible:ring-2`) to maintain accessibility within the styled environment. Also remember to disable buttons logically during async tasks (like AI typing).
