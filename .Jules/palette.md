@@ -1,0 +1,3 @@
+## 2024-03-12 - Accessibility gaps in Glassmorphism UI
+**Learning:** Icon-only buttons in the existing neon/glassmorphism UI patterns (like the DJ deck controls and AI chat toggles) frequently lack structural ARIA labels, creating a poor screen reader experience. Additionally, relying on hover states without explicit `focus-visible` indicators makes keyboard navigation invisible.
+**Action:** Always verify that interactive elements with solely visual indicators (icons) receive `aria-label`s and that their focus states are explicitly styled using `focus-visible:ring-2` to maintain keyboard accessibility without disrupting the visual aesthetic for pointer users.
