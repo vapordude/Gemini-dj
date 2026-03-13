@@ -1,0 +1,4 @@
+## 2024-05-18 - Glassmorphism Requires Explicit Focus Indicators
+
+**Learning:** When working with the dark, glassmorphism UI style present in Scarlet-Vox (heavy use of zinc/indigo colors, translucency, and borders), the default browser focus outlines are often invisible or clash poorly with the aesthetic.
+**Action:** Always manually define focus states for interactive elements (especially buttons and inputs) using Tailwind's `focus-visible` utility. A good standard pattern for this app is `focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500` (or `ring-white` depending on the background contrast). This ensures keyboard navigation is clearly visible without compromising the design.
