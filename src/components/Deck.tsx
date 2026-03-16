@@ -144,6 +144,7 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
         {/* Play/Pause */}
         <div className="col-span-1 flex items-center justify-center">
           <button
+            aria-label={isPlaying ? "Pause" : "Play"}
             onClick={isPlaying ? controls.pause : controls.play}
             className={`w-full h-full rounded-xl flex items-center justify-center transition-all shadow-xl border ${
               isPlaying
@@ -158,6 +159,7 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
         {/* Sync & Loop */}
         <div className="col-span-1 flex flex-col gap-2">
           <button
+            aria-label="Sync"
             onClick={() => controls.setPlaybackRate(playbackRate === 1 ? 1.05 : 1)}
             className={`flex-1 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all ${
               playbackRate !== 1
@@ -169,6 +171,7 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
             <span className="text-[8px] font-bold tracking-wider">SYNC</span>
           </button>
           <button
+            aria-label="Loop"
             onClick={() => controls.toggleLoop(4)}
             className={`flex-1 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all ${
               isLooping
