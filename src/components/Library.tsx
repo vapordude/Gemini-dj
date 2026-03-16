@@ -98,6 +98,7 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
         <div className="space-y-1">
           <div className="flex items-center justify-between mb-4 px-2">
             <button
+              aria-label="Back to playlists"
               onClick={() => setSelectedPlaylist(null)}
               className="flex items-center gap-2 text-[10px] text-zinc-400 hover:text-white uppercase tracking-wider font-bold"
             >
@@ -221,10 +222,10 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
     <div className="h-full flex flex-col relative">
       {/* Tabs */}
       <div className="flex border-b border-white/5 bg-zinc-900/30">
-        <TabButton active={activeTab === 'search'} onClick={() => setActiveTab('search')} icon={Search} />
-        <TabButton active={activeTab === 'playlists'} onClick={() => setActiveTab('playlists')} icon={List} />
-        <TabButton active={activeTab === 'songs'} onClick={() => setActiveTab('songs')} icon={Disc} />
-        <TabButton active={activeTab === 'artists'} onClick={() => setActiveTab('artists')} icon={User} />
+        <TabButton aria-label="Search" active={activeTab === 'search'} onClick={() => setActiveTab('search')} icon={Search} />
+        <TabButton aria-label="Playlists" active={activeTab === 'playlists'} onClick={() => setActiveTab('playlists')} icon={List} />
+        <TabButton aria-label="Songs" active={activeTab === 'songs'} onClick={() => setActiveTab('songs')} icon={Disc} />
+        <TabButton aria-label="Artists" active={activeTab === 'artists'} onClick={() => setActiveTab('artists')} icon={User} />
       </div>
 
       {activeTab === 'search' && (
@@ -249,9 +250,10 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
   );
 }
 
-function TabButton({ active, onClick, icon: Icon }: { active: boolean; onClick: () => void; icon: any }) {
+function TabButton({ active, onClick, icon: Icon, 'aria-label': ariaLabel }: { active: boolean; onClick: () => void; icon: any; 'aria-label'?: string }) {
   return (
     <button
+      aria-label={ariaLabel}
       onClick={onClick}
       className={`flex-1 py-3 flex justify-center items-center transition-all border-b-2 relative overflow-hidden ${
         active ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5' : 'border-transparent text-zinc-600 hover:text-zinc-400 hover:bg-white/5'
