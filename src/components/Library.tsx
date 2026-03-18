@@ -99,13 +99,13 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
           <div className="flex items-center justify-between mb-4 px-2">
             <button
               onClick={() => setSelectedPlaylist(null)}
-              className="flex items-center gap-2 text-[10px] text-zinc-400 hover:text-white uppercase tracking-wider font-bold"
+              className="flex items-center gap-2 text-[10px] text-zinc-400 hover:text-white uppercase tracking-wider font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded px-1"
             >
               <ChevronLeft size={12} /> Back
             </button>
             <button
               onClick={() => onQueueTracks(playlistTracks)}
-              className="flex items-center gap-2 px-3 py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-[10px] font-bold rounded-full transition-colors border border-indigo-500/30"
+              className="flex items-center gap-2 px-3 py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-[10px] font-bold rounded-full transition-colors border border-indigo-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             >
               <PlayCircle size={12} /> PLAY ALL
             </button>
@@ -124,7 +124,7 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
             <div className="flex justify-end mb-2 px-2">
               <button
                 onClick={() => onQueueTracks(results)}
-                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider"
+                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded px-1"
               >
                 QUEUE ALL
               </button>
@@ -176,7 +176,7 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
                   }));
                   onQueueTracks(tracks);
                 }}
-                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider"
+                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded px-1"
               >
                 QUEUE ALL
               </button>
@@ -221,10 +221,10 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
     <div className="h-full flex flex-col relative">
       {/* Tabs */}
       <div className="flex border-b border-white/5 bg-zinc-900/30">
-        <TabButton active={activeTab === 'search'} onClick={() => setActiveTab('search')} icon={Search} />
-        <TabButton active={activeTab === 'playlists'} onClick={() => setActiveTab('playlists')} icon={List} />
-        <TabButton active={activeTab === 'songs'} onClick={() => setActiveTab('songs')} icon={Disc} />
-        <TabButton active={activeTab === 'artists'} onClick={() => setActiveTab('artists')} icon={User} />
+        <TabButton ariaLabel="Search" active={activeTab === 'search'} onClick={() => setActiveTab('search')} icon={Search} />
+        <TabButton ariaLabel="Playlists" active={activeTab === 'playlists'} onClick={() => setActiveTab('playlists')} icon={List} />
+        <TabButton ariaLabel="Songs" active={activeTab === 'songs'} onClick={() => setActiveTab('songs')} icon={Disc} />
+        <TabButton ariaLabel="Artists" active={activeTab === 'artists'} onClick={() => setActiveTab('artists')} icon={User} />
       </div>
 
       {activeTab === 'search' && (
@@ -249,11 +249,12 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
   );
 }
 
-function TabButton({ active, onClick, icon: Icon }: { active: boolean; onClick: () => void; icon: any }) {
+function TabButton({ active, onClick, icon: Icon, ariaLabel }: { active: boolean; onClick: () => void; icon: any; ariaLabel: string }) {
   return (
     <button
       onClick={onClick}
-      className={`flex-1 py-3 flex justify-center items-center transition-all border-b-2 relative overflow-hidden ${
+      aria-label={ariaLabel}
+      className={`flex-1 py-3 flex justify-center items-center transition-all border-b-2 relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
         active ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5' : 'border-transparent text-zinc-600 hover:text-zinc-400 hover:bg-white/5'
       }`}
     >
