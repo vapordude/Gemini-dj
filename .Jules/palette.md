@@ -1,0 +1,3 @@
+## 2024-05-18 - Ensuring accessible focus states in neon/glassmorphism UI
+**Learning:** In highly styled UIs with custom backgrounds, gradients, and shadows (like neon or glassmorphism), standard browser focus rings are often invisible or look broken. Using only `focus:outline-none` removes the browser default, making the application inaccessible to keyboard users, especially for icon-only buttons.
+**Action:** Always combine `focus:outline-none` with explicit focus indicators that match the design system, such as `focus-visible:ring-2 focus-visible:ring-[theme-color]` (e.g., `focus-visible:ring-indigo-500` or `focus-visible:ring-white/50`). Apply this consistently to all interactive elements, including icon buttons and custom tabs.
