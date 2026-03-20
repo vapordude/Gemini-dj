@@ -57,13 +57,14 @@ export function Mixer({ crossfader, onCrossfaderChange }: MixerProps) {
                 max="1"
                 step="0.01"
                 value={crossfader}
+                aria-label="Crossfader"
                 onChange={(e) => onCrossfaderChange(parseFloat(e.target.value))}
-                className="absolute w-full h-full opacity-0 cursor-pointer z-30"
+                className="peer absolute w-full h-full opacity-0 cursor-pointer z-30 focus:outline-none"
                 />
 
                 {/* Physical Fader Cap */}
                 <div 
-                className="absolute h-10 w-6 bg-gradient-to-b from-zinc-200 to-zinc-400 rounded-sm shadow-[0_4px_10px_rgba(0,0,0,0.5)] border-t border-white/50 z-20 pointer-events-none flex items-center justify-center"
+                className="absolute h-10 w-6 bg-gradient-to-b from-zinc-200 to-zinc-400 rounded-sm shadow-[0_4px_10px_rgba(0,0,0,0.5)] border-t border-white/50 z-20 pointer-events-none flex items-center justify-center peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500"
                 style={{ 
                     left: `${crossfader * 100}%`,
                     transform: 'translateX(-50%)'
