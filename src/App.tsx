@@ -95,11 +95,20 @@ export default function App() {
           <button
             onClick={triggerManualTransition}
             disabled={generating || !deckA.state.track || !deckB.state.track}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all ${
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none ${
               generating
                 ? 'bg-zinc-800 text-zinc-500 cursor-wait'
+                : !deckA.state.track || !deckB.state.track
+                ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed opacity-50'
                 : 'bg-white text-black hover:bg-zinc-200 shadow-lg shadow-white/10'
             }`}
+            title={
+              generating
+                ? 'Generating transition...'
+                : (!deckA.state.track || !deckB.state.track)
+                ? 'Load tracks on both decks to transition'
+                : 'Trigger manual transition'
+            }
           >
             {generating ? (
               <span className="animate-pulse">GENERATING...</span>
