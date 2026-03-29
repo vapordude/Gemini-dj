@@ -1,0 +1,3 @@
+## 2024-03-29 - Missing explicit disabled states on conditional buttons
+**Learning:** Conditional buttons (like the transition button) often rely on HTML's native `disabled` attribute alone. This leaves users confused when the button doesn't work because it looks enabled or lacks context. It's critical to pair the `disabled` attribute with explicit visual styling (e.g., `opacity-50`, `cursor-not-allowed`) and a `title` tooltip that explains *why* the button is disabled and *how* to enable it.
+**Action:** Always verify that buttons disabled by state have a visible disabled style and a tooltip explaining the requirement.
