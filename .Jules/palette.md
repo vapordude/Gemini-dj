@@ -1,0 +1,3 @@
+## 2024-04-01 - Disabled State Multi-Condition Styling
+**Learning:** Complex disabled states (like a transition button requiring multiple tracks) often need explicit multi-condition styling to prevent user frustration. The default disabled attribute alone may not provide enough visual feedback in customized UI. Using Tailwind's `disabled:` variants ensures the visual disabled state perfectly mirrors the HTML disabled attribute.
+**Action:** Always combine the HTML `disabled` attribute with explicit visual cues (e.g., `disabled:opacity-50 disabled:cursor-not-allowed`) and a `title` tooltip explaining the required conditions to re-enable the element.
