@@ -82,11 +82,13 @@ export default function App() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => setAutoDJ(!autoDJ)}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all border ${
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all border focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none ${
               autoDJ
                 ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300 shadow-[0_0_15px_rgba(99,102,241,0.3)]'
                 : 'bg-zinc-800 border-white/10 text-zinc-400 hover:bg-zinc-700'
             }`}
+            aria-pressed={autoDJ}
+            title={autoDJ ? "Disable Auto DJ" : "Enable Auto DJ"}
           >
             <Zap size={14} className={autoDJ ? 'fill-current text-indigo-300' : ''} />
             <span>AUTO DJ {autoDJ ? 'ON' : 'OFF'}</span>
@@ -95,11 +97,12 @@ export default function App() {
           <button
             onClick={triggerManualTransition}
             disabled={generating || !deckA.state.track || !deckB.state.track}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all ${
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
               generating
-                ? 'bg-zinc-800 text-zinc-500 cursor-wait'
+                ? 'bg-zinc-800 text-zinc-500'
                 : 'bg-white text-black hover:bg-zinc-200 shadow-lg shadow-white/10'
             }`}
+            title={generating ? "Generating transition..." : (!deckA.state.track || !deckB.state.track ? "Load tracks on both decks to transition" : "Trigger AI DJ Transition")}
           >
             {generating ? (
               <span className="animate-pulse">GENERATING...</span>
