@@ -1,0 +1,3 @@
+## 2026-04-05 - Dynamic Tooltips on Conditionally Disabled Buttons
+**Learning:** When buttons are disabled conditionally (e.g., waiting for both decks to have tracks loaded vs. transition in progress), just setting `disabled` isn't enough. The reason for being disabled should be explicitly communicated. Mixing multiple disabled states without distinct styling or tooltips confuses the user as they might not know how to un-disable it.
+**Action:** Always pair conditionally disabled states with a dynamic `title` tooltip that explains exactly what condition is not met, and ensure the CSS clearly reflects a disabled, non-interactive element (e.g., `cursor-not-allowed opacity-50`).
