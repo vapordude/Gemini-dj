@@ -1,0 +1,3 @@
+## 2024-05-24 - Multi-Condition Disabled Button UX
+**Learning:** When a button's disabled state depends on multiple complex conditions (e.g., both decks must have tracks loaded AND a generation cannot be in progress), simply disabling the button is insufficient. Users need explicit visual feedback (like reduced opacity or a not-allowed cursor) and clear, contextual explanations of *why* the button is disabled to prevent confusion.
+**Action:** Always pair `disabled` attributes with explicit visual cues (`disabled:opacity-50`, `disabled:cursor-not-allowed`) and a dynamic `title` tooltip indicating exactly what condition is preventing interaction.
