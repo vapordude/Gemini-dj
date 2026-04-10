@@ -95,9 +95,14 @@ export default function App() {
           <button
             onClick={triggerManualTransition}
             disabled={generating || !deckA.state.track || !deckB.state.track}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all ${
+            title={
+              generating ? "Transition in progress..." :
+              (!deckA.state.track || !deckB.state.track) ? "Tracks must be loaded on both decks to transition" :
+              "Start manual transition"
+            }
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
               generating
-                ? 'bg-zinc-800 text-zinc-500 cursor-wait'
+                ? 'bg-zinc-800 text-zinc-500'
                 : 'bg-white text-black hover:bg-zinc-200 shadow-lg shadow-white/10'
             }`}
           >
