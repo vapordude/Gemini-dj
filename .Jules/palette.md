@@ -1,0 +1,3 @@
+## 2024-05-18 - Missing Multi-Condition Disabled Feedback
+**Learning:** Found buttons with multi-conditional disabled logic (e.g. generating AI transition OR missing track info) sharing a single vague disabled state. This creates confusion when the condition keeping the button disabled changes silently (e.g., waiting for AI vs missing tracks on decks).
+**Action:** Always map complex `disabled` logic to distinct `title` tooltips and specific visual styles (e.g., `cursor-wait` for processing vs `opacity-50 cursor-not-allowed` for missing requirements) to give exact guidance on why interaction is blocked.
