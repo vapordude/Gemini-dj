@@ -1,0 +1,3 @@
+## 2024-05-14 - Multi-Condition Disabled Button Tooltips
+**Learning:** When a main action button (like TRANSITION) has multiple reasons for being disabled (e.g., waiting on async task vs. missing user input), using a generic "Disabled" visual state or static tooltip is insufficient and frustrating. Users need to know *why* it's disabled.
+**Action:** Always implement dynamic `title` tooltips that map directly to the specific condition causing the `disabled` state (e.g., `generating ? "Generating..." : "Load tracks..."`). Pair this with explicit visual cues (like `disabled:opacity-50 disabled:cursor-not-allowed`) using Tailwind utilities.
