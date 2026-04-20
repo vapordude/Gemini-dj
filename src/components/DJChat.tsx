@@ -95,8 +95,10 @@ export function DJChat({ onCommand }: DJChatProps) {
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(true)}
+        aria-label="Open DJ Chat"
+        title="Open DJ Chat"
         className={`fixed bottom-6 right-6 z-50 p-4 bg-indigo-600 rounded-full shadow-2xl text-white border border-indigo-400
-          transition-all duration-200 hover:scale-110 active:scale-90
+          transition-all duration-200 hover:scale-110 active:scale-90 focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 focus-visible:outline-none
           ${isOpen ? 'opacity-0 pointer-events-none scale-75' : 'opacity-100 scale-100'}`}
       >
         <div className="absolute inset-0 rounded-full bg-indigo-400 opacity-20 animate-ping" />
@@ -125,7 +127,9 @@ export function DJChat({ onCommand }: DJChatProps) {
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white"
+            aria-label="Close DJ Chat"
+            title="Close DJ Chat"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none"
           >
             <X size={18} />
           </button>
@@ -171,7 +175,14 @@ export function DJChat({ onCommand }: DJChatProps) {
             />
             <button
               onClick={handleSend}
-              className="p-2.5 bg-indigo-600 rounded-xl text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 border border-indigo-400/50"
+              disabled={!input.trim() || isTyping}
+              aria-label="Send message"
+              title={!input.trim() ? "Enter a message to send" : isTyping ? "AI is typing..." : "Send message"}
+              className={`p-2.5 rounded-xl transition-all shadow-lg focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none ${
+                !input.trim() || isTyping
+                  ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-white/5'
+                  : 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-500/20 border border-indigo-400/50'
+              }`}
             >
               <Send size={18} />
             </button>
@@ -181,25 +192,25 @@ export function DJChat({ onCommand }: DJChatProps) {
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
             <button
               onClick={() => onCommand('fx', { type: 'stutter' })}
-              className="text-[10px] px-3 py-1.5 bg-zinc-800/50 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 border border-white/5 whitespace-nowrap font-mono transition-colors flex items-center gap-1"
+              className="text-[10px] px-3 py-1.5 bg-zinc-800/50 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 border border-white/5 whitespace-nowrap font-mono transition-colors flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none"
             >
               <Zap size={10} className="text-yellow-500 fill-current" /> STUTTER
             </button>
             <button
               onClick={() => onCommand('fx', { type: 'brake' })}
-              className="text-[10px] px-3 py-1.5 bg-zinc-800/50 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 border border-white/5 whitespace-nowrap font-mono transition-colors flex items-center gap-1"
+              className="text-[10px] px-3 py-1.5 bg-zinc-800/50 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 border border-white/5 whitespace-nowrap font-mono transition-colors flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none"
             >
               <div className="w-2 h-2 rounded-full bg-red-500" /> BRAKE
             </button>
             <button
               onClick={() => onCommand('fx', { type: 'glitch' })}
-              className="text-[10px] px-3 py-1.5 bg-zinc-800/50 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 border border-white/5 whitespace-nowrap font-mono transition-colors flex items-center gap-1"
+              className="text-[10px] px-3 py-1.5 bg-zinc-800/50 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 border border-white/5 whitespace-nowrap font-mono transition-colors flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none"
             >
               <div className="w-2 h-2 rounded-sm bg-cyan-500 animate-pulse" /> GLITCH
             </button>
             <button
               onClick={() => onCommand('fx', { type: 'spinUp' })}
-              className="text-[10px] px-3 py-1.5 bg-zinc-800/50 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 border border-white/5 whitespace-nowrap font-mono transition-colors flex items-center gap-1"
+              className="text-[10px] px-3 py-1.5 bg-zinc-800/50 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 border border-white/5 whitespace-nowrap font-mono transition-colors flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none"
             >
               <div className="w-2 h-2 rounded-full border border-green-500" /> SPIN
             </button>
