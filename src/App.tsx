@@ -95,10 +95,17 @@ export default function App() {
           <button
             onClick={triggerManualTransition}
             disabled={generating || !deckA.state.track || !deckB.state.track}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all ${
+            title={
+              generating
+                ? "Transition currently generating"
+                : (!deckA.state.track || !deckB.state.track)
+                  ? "Load tracks on both Deck A and Deck B to transition"
+                  : "Trigger AI DJ Transition"
+            }
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none disabled:opacity-50 ${
               generating
                 ? 'bg-zinc-800 text-zinc-500 cursor-wait'
-                : 'bg-white text-black hover:bg-zinc-200 shadow-lg shadow-white/10'
+                : 'bg-white text-black hover:bg-zinc-200 shadow-lg shadow-white/10 disabled:cursor-not-allowed'
             }`}
           >
             {generating ? (
