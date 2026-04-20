@@ -1,0 +1,3 @@
+## 2026-04-20 - Multi-condition Disabled Button Clarity
+**Learning:** When buttons have multi-condition disabled logic (e.g., missing tracks vs. currently generating), users can become frustrated if a generic disabled style is used without explaining *why* it's disabled. Providing a dynamic `title` attribute that mirrors the exact condition failing makes the interaction significantly more intuitive and user-friendly.
+**Action:** Always pair disabled attributes with explicit visual cues (e.g., opacity, cursor styles) AND dynamic tooltips that explain exactly what condition needs to be met or what process is blocking the action.
