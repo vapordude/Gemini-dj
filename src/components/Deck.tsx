@@ -145,6 +145,7 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
         <div className="col-span-1 flex items-center justify-center">
           <button
             onClick={isPlaying ? controls.pause : controls.play}
+            aria-label={isPlaying ? 'Pause track' : 'Play track'}
             className={`w-full h-full rounded-xl flex items-center justify-center transition-all shadow-xl border ${
               isPlaying
                 ? 'bg-zinc-900 text-red-500 border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
