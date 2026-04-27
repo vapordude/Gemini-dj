@@ -17,7 +17,7 @@ export function useAutoDJ({ deckA, deckB, crossfader, setCrossfader, queue, setQ
   const [generating, setGenerating] = useState(false);
   const transitionRef = useRef<boolean>(false);
 
-  const performAutoTransition = async (currentDeck: any, nextDeck: any, forceStart = false) => {
+  const performAutoTransition = async (currentDeck: any, nextDeck: any) => {
     if (transitionRef.current) return;
     transitionRef.current = true;
     setIsTransitioning(true);
@@ -174,14 +174,14 @@ export function useAutoDJ({ deckA, deckB, crossfader, setCrossfader, queue, setQ
     }
     // If active deck stopped but we have queue, start next
     else if (!activeDeck.state.isPlaying && !transitionRef.current && queue.length > 0) {
-        performAutoTransition(activeDeck, inactiveDeck, true);
+        performAutoTransition(activeDeck, inactiveDeck);
     }
   }, [autoDJ, queue, deckA.state.currentTime, deckB.state.currentTime, isTransitioning, crossfader]);
 
   const triggerManualTransition = () => {
       const activeDeck = crossfader < 0.5 ? deckA : deckB;
       const inactiveDeck = crossfader < 0.5 ? deckB : deckA;
-      performAutoTransition(activeDeck, inactiveDeck, true);
+      performAutoTransition(activeDeck, inactiveDeck);
   };
 
   return {
