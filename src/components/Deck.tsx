@@ -145,6 +145,8 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
         <div className="col-span-1 flex items-center justify-center">
           <button
             onClick={isPlaying ? controls.pause : controls.play}
+            aria-label={isPlaying ? `Pause Deck ${id}` : `Play Deck ${id}`}
+            title={isPlaying ? `Pause Deck ${id}` : `Play Deck ${id}`}
             className={`w-full h-full rounded-xl flex items-center justify-center transition-all shadow-xl border ${
               isPlaying
                 ? 'bg-zinc-900 text-red-500 border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
@@ -159,6 +161,8 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
         <div className="col-span-1 flex flex-col gap-2">
           <button
             onClick={() => controls.setPlaybackRate(playbackRate === 1 ? 1.05 : 1)}
+            aria-label={playbackRate !== 1 ? `Disable Sync on Deck ${id}` : `Enable Sync on Deck ${id}`}
+            title={playbackRate !== 1 ? `Disable Sync` : `Enable Sync`}
             className={`flex-1 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all ${
               playbackRate !== 1
                 ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
@@ -170,6 +174,8 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
           </button>
           <button
             onClick={() => controls.toggleLoop(4)}
+            aria-label={isLooping ? `Disable Loop on Deck ${id}` : `Enable 4-beat Loop on Deck ${id}`}
+            title={isLooping ? `Disable Loop` : `Enable 4-beat Loop`}
             className={`flex-1 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all ${
               isLooping
                 ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400 animate-pulse'
