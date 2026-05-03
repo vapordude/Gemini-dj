@@ -57,6 +57,8 @@ export function Mixer({ crossfader, onCrossfaderChange }: MixerProps) {
                 max="1"
                 step="0.01"
                 value={crossfader}
+                aria-label="Crossfader"
+                title="Crossfader"
                 onChange={(e) => onCrossfaderChange(parseFloat(e.target.value))}
                 className="absolute w-full h-full opacity-0 cursor-pointer z-30"
                 />
