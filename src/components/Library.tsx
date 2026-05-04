@@ -220,11 +220,11 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
   return (
     <div className="h-full flex flex-col relative">
       {/* Tabs */}
-      <div className="flex border-b border-white/5 bg-zinc-900/30">
-        <TabButton active={activeTab === 'search'} onClick={() => setActiveTab('search')} icon={Search} />
-        <TabButton active={activeTab === 'playlists'} onClick={() => setActiveTab('playlists')} icon={List} />
-        <TabButton active={activeTab === 'songs'} onClick={() => setActiveTab('songs')} icon={Disc} />
-        <TabButton active={activeTab === 'artists'} onClick={() => setActiveTab('artists')} icon={User} />
+      <div className="flex border-b border-white/5 bg-zinc-900/30" role="tablist" aria-label="Library Navigation">
+        <TabButton active={activeTab === 'search'} onClick={() => setActiveTab('search')} icon={Search} label="Search" />
+        <TabButton active={activeTab === 'playlists'} onClick={() => setActiveTab('playlists')} icon={List} label="Playlists" />
+        <TabButton active={activeTab === 'songs'} onClick={() => setActiveTab('songs')} icon={Disc} label="Songs" />
+        <TabButton active={activeTab === 'artists'} onClick={() => setActiveTab('artists')} icon={User} label="Artists" />
       </div>
 
       {activeTab === 'search' && (
@@ -249,11 +249,15 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
   );
 }
 
-function TabButton({ active, onClick, icon: Icon }: { active: boolean; onClick: () => void; icon: any }) {
+function TabButton({ active, onClick, icon: Icon, label }: { active: boolean; onClick: () => void; icon: any; label: string }) {
   return (
     <button
+      role="tab"
+      aria-selected={active}
+      aria-label={label}
+      title={label}
       onClick={onClick}
-      className={`flex-1 py-3 flex justify-center items-center transition-all border-b-2 relative overflow-hidden ${
+      className={`flex-1 py-3 flex justify-center items-center transition-all border-b-2 relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
         active ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5' : 'border-transparent text-zinc-600 hover:text-zinc-400 hover:bg-white/5'
       }`}
     >
