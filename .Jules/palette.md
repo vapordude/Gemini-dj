@@ -1,3 +1,6 @@
 ## 2024-05-18 - Multi-Condition Disabled States
 **Learning:** When buttons have multiple reasons for being disabled (e.g., missing tracks vs. currently generating), using global `disabled:cursor-not-allowed` creates poor UX if the user is actually waiting. Similarly, a generic tooltip isn't helpful if the disabled reason isn't obvious.
 **Action:** Always conditionally apply cursor classes (`cursor-wait` vs `cursor-not-allowed`) and `title` tooltips based on the exact condition that is failing. Ensure `opacity` or similar visual cues correctly correspond to the state.
+## 2025-03-05 - Icon-only Tab Button Accessibility
+**Learning:** In custom glassmorphism/neon design systems, icon-only tabs are common but often lack proper semantic structure. Users relying on screen readers or keyboard navigation miss context when tabs only use visual cues (icons/active colors) without explicit text descriptions.
+**Action:** Always ensure custom tab components include a descriptive `aria-label` and `title` via a dedicated prop (e.g., `label`), implement proper ARIA roles (`role="tablist"` on the container, `role="tab"` and `aria-selected` on the items), and maintain visible keyboard focus indicators (`focus-visible:ring-2`) that fit the application's aesthetic.
