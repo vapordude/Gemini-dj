@@ -9,13 +9,45 @@ interface LibraryProps {
 
 type Tab = 'search' | 'playlists' | 'songs' | 'artists';
 
+interface LibraryThumbnail {
+  url: string;
+}
+
+interface LibraryPlaylist {
+  playlistId: string;
+  name: string;
+  thumbnails?: LibraryThumbnail[];
+  count?: number;
+}
+
+interface LibrarySong {
+  videoId: string;
+  name: string;
+  artist?: {
+    name: string;
+  };
+  thumbnails?: LibraryThumbnail[];
+  duration?: number;
+}
+
+interface LibraryArtist {
+  artistId: string;
+  name: string;
+  thumbnails?: LibraryThumbnail[];
+}
+
+interface IconProps {
+  size?: number;
+  className?: string;
+}
+
 export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
   const [activeTab, setActiveTab] = useState<Tab>('search');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Track[]>([]);
-  const [playlists, setPlaylists] = useState<any[]>([]);
-  const [songs, setSongs] = useState<any[]>([]);
-  const [artists, setArtists] = useState<any[]>([]);
+  const [playlists, setPlaylists] = useState<LibraryPlaylist[]>([]);
+  const [songs, setSongs] = useState<LibrarySong[]>([]);
+  const [artists, setArtists] = useState<LibraryArtist[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
   const [playlistTracks, setPlaylistTracks] = useState<Track[]>([]);
@@ -142,14 +174,18 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
 
       case 'playlists':
         return playlists.length > 0 ? (
-          playlists.map((playlist: any) => (
+          playlists.map(playlist => (
             <div
               key={playlist.playlistId}
               className="group flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/5"
               onClick={() => fetchPlaylistTracks(playlist.playlistId)}
             >
               <div className="w-10 h-10 rounded bg-zinc-800 overflow-hidden shadow-lg">
-                <img src={playlist.thumbnails?.[0]?.url} alt={playlist.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                <img
+                  src={playlist.thumbnails?.[0]?.url}
+                  alt={playlist.name}
+                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-xs font-bold text-zinc-300 group-hover:text-white truncate">{playlist.name}</h4>
@@ -167,12 +203,12 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
             <div className="flex justify-end mb-2 px-2">
               <button
                 onClick={() => {
-                  const tracks = songs.map((s: any) => ({
+                  const tracks = songs.map(s => ({
                     id: s.videoId,
                     title: s.name,
                     artist: s.artist?.name || 'Unknown',
-                    thumbnail: s.thumbnails?.[0]?.url,
-                    duration: s.duration || 0,
+                    thumbnail: s.thumbnails?.[0]?.url || '',
+                    duration: typeof s.duration === 'number' ? s.duration : 0,
                   }));
                   onQueueTracks(tracks);
                 }}
@@ -181,15 +217,15 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
                 QUEUE ALL
               </button>
             </div>
-            {songs.map((song: any) => (
+            {songs.map(song => (
               <TrackItem
                 key={song.videoId}
                 track={{
                   id: song.videoId,
                   title: song.name,
                   artist: song.artist?.name || 'Unknown',
-                  thumbnail: song.thumbnails?.[0]?.url,
-                  duration: song.duration || 0,
+                  thumbnail: song.thumbnails?.[0]?.url || '',
+                  duration: typeof song.duration === 'number' ? song.duration : 0,
                 }}
                 onLoadTrack={onLoadTrack}
               />
@@ -201,10 +237,17 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
 
       case 'artists':
         return artists.length > 0 ? (
-          artists.map((artist: any) => (
-            <div key={artist.artistId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/5 group">
+          artists.map(artist => (
+            <div
+              key={artist.artistId}
+              className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/5 group"
+            >
               <div className="w-10 h-10 rounded-full bg-zinc-800 overflow-hidden shadow-lg border border-white/5">
-                <img src={artist.thumbnails?.[0]?.url} alt={artist.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                <img
+                  src={artist.thumbnails?.[0]?.url}
+                  alt={artist.name}
+                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-xs font-bold text-zinc-300 group-hover:text-white truncate">{artist.name}</h4>
@@ -249,7 +292,7 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
   );
 }
 
-function TabButton({ active, onClick, icon: Icon }: { active: boolean; onClick: () => void; icon: any }) {
+function TabButton({ active, onClick, icon: Icon }: { active: boolean; onClick: () => void; icon: React.ComponentType<IconProps> }) {
   return (
     <button
       onClick={onClick}
@@ -291,7 +334,7 @@ const TrackItem: React.FC<TrackItemProps> = ({ track, onLoadTrack }) => (
   </div>
 );
 
-function EmptyState({ icon: Icon, label }: { icon: any; label: string }) {
+function EmptyState({ icon: Icon, label }: { icon: React.ComponentType<IconProps>; label: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-zinc-700">
       <Icon className="w-8 h-8 mb-2 opacity-20" />
