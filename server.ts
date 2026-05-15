@@ -9,6 +9,12 @@ import { Readable } from 'stream';
 import YTMusic from 'ytmusic-api';
 
 const app = express();
+
+// Security Constants
+const MAX_SPEECH_TEXT = 1000;
+const MAX_CHAT_MESSAGE = 2000;
+const MAX_TRACK_METADATA = 250;
+const MAX_VIBE_TEXT = 500;
 const PORT = 3000;
 
 // Initialize Gemini AI
@@ -229,6 +235,14 @@ apiRouter.post('/chat', async (req, res) => {
             return res.status(400).json({ error: 'Missing message' });
         }
 
+        if (message.length > MAX_CHAT_MESSAGE) {
+          return res.status(400).json({ error: `Message too long (max ${MAX_CHAT_MESSAGE} characters)` });
+        }
+
+        if (systemInstruction && systemInstruction.length > MAX_CHAT_MESSAGE) {
+          return res.status(400).json({ error: `System instruction too long (max ${MAX_CHAT_MESSAGE} characters)` });
+        }
+
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: message,
@@ -251,6 +265,10 @@ apiRouter.post('/analyze-track', async (req, res) => {
     const { title, artist } = req.body;
     if (!title || !artist) {
       return res.status(400).json({ error: 'Missing title or artist' });
+    }
+
+    if (title.length > MAX_TRACK_METADATA || artist.length > MAX_TRACK_METADATA) {
+      return res.status(400).json({ error: `Track metadata too long (max ${MAX_TRACK_METADATA} characters)` });
     }
 
     const prompt = `
@@ -292,6 +310,19 @@ apiRouter.post('/analyze-track', async (req, res) => {
 apiRouter.post('/dj/commentary', async (req, res) => {
   try {
     const { currentTrack, nextTrack, vibe } = req.body;
+
+    if (vibe && vibe.length > MAX_VIBE_TEXT) {
+      return res.status(400).json({ error: `Vibe too long (max ${MAX_VIBE_TEXT} characters)` });
+    }
+
+    if (
+      (currentTrack?.title?.length > MAX_TRACK_METADATA) ||
+      (currentTrack?.artist?.length > MAX_TRACK_METADATA) ||
+      (nextTrack?.title?.length > MAX_TRACK_METADATA) ||
+      (nextTrack?.artist?.length > MAX_TRACK_METADATA)
+    ) {
+      return res.status(400).json({ error: `Track metadata too long (max ${MAX_TRACK_METADATA} characters)` });
+    }
     
     const prompt = `
       You are a world-class radio DJ.
@@ -322,6 +353,10 @@ apiRouter.post('/dj/speech', async (req, res) => {
     const { text } = req.body;
     if (!text) {
       return res.status(400).json({ error: 'Missing text' });
+    }
+
+    if (text.length > MAX_SPEECH_TEXT) {
+      return res.status(400).json({ error: `Text too long (max ${MAX_SPEECH_TEXT} characters)` });
     }
 
     const response = await ai.models.generateContent({
