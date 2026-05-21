@@ -5,3 +5,7 @@
 ## 2024-05-18 - Accessible Custom Tabs
 **Learning:** Custom UI tabs built with generic `div` and `button` elements are inaccessible to screen readers without explicit ARIA roles. Icon-only tabs further degrade accessibility without proper labeling and keyboard focus indicators.
 **Action:** Always implement `role="tablist"` on the container (and optionally `aria-label`). For individual tabs, ensure `role="tab"`, `aria-selected`, `aria-label`, and `title` attributes are applied. Always include explicit focus states (e.g., `focus-visible:ring-2`) for keyboard navigation.
+
+## 2024-05-22 - Form Async Generation Disabled States
+**Learning:** Failing to explicitly disable chat inputs and submit buttons during asynchronous generation (e.g., waiting for AI response) leads to multi-submission bugs and creates uncertainty for the user.
+**Action:** Always disable text inputs and submit buttons during generation states (e.g., `isTyping`). Provide clear visual feedback using `disabled:opacity-50 disabled:cursor-not-allowed` and appropriate conditional tooltips for screen readers and mouse users.
