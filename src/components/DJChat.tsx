@@ -95,8 +95,11 @@ export function DJChat({ onCommand }: DJChatProps) {
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(true)}
+        aria-label="Open AI DJ Chat"
+        title="Open AI DJ Chat"
+        aria-expanded={isOpen}
         className={`fixed bottom-6 right-6 z-50 p-4 bg-indigo-600 rounded-full shadow-2xl text-white border border-indigo-400
-          transition-all duration-200 hover:scale-110 active:scale-90
+          transition-all duration-200 hover:scale-110 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950
           ${isOpen ? 'opacity-0 pointer-events-none scale-75' : 'opacity-100 scale-100'}`}
       >
         <div className="absolute inset-0 rounded-full bg-indigo-400 opacity-20 animate-ping" />
@@ -125,7 +128,9 @@ export function DJChat({ onCommand }: DJChatProps) {
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white"
+            aria-label="Close AI DJ Chat"
+            title="Close AI DJ Chat"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
           >
             <X size={18} />
           </button>
@@ -165,13 +170,17 @@ export function DJChat({ onCommand }: DJChatProps) {
               type="text"
               value={input}
               onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder="Enter command or request..."
-              className="flex-1 bg-zinc-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:bg-zinc-900 transition-all font-mono shadow-inner"
+              onKeyDown={e => e.key === 'Enter' && !isTyping && handleSend()}
+              placeholder={isTyping ? "Generating response..." : "Enter command or request..."}
+              disabled={isTyping}
+              className="flex-1 bg-zinc-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:bg-zinc-900 transition-all font-mono shadow-inner disabled:opacity-50 disabled:cursor-wait"
             />
             <button
               onClick={handleSend}
-              className="p-2.5 bg-indigo-600 rounded-xl text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 border border-indigo-400/50"
+              disabled={isTyping || !input.trim()}
+              aria-label="Send message"
+              title={isTyping ? "Waiting for AI..." : !input.trim() ? "Type a message to send" : "Send message"}
+              className="p-2.5 bg-indigo-600 rounded-xl text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 border border-indigo-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send size={18} />
             </button>
