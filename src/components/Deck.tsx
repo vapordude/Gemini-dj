@@ -95,13 +95,15 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
             </div>
           </>
         ) : (
-          <div
+          <button
             onClick={onLoadTrack}
-            className="w-full h-full border-2 border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center text-zinc-600 hover:border-zinc-600 hover:text-zinc-400 transition-all cursor-pointer group/empty bg-zinc-900/30"
+            aria-label={`Load track into Deck ${id}`}
+            title={`Load track into Deck ${id}`}
+            className="w-full h-full border-2 border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center text-zinc-600 hover:border-zinc-600 hover:text-zinc-400 transition-all cursor-pointer group/empty bg-zinc-900/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
           >
             <Disc className="w-12 h-12 mb-3 opacity-20 group-hover/empty:opacity-50 transition-opacity" />
             <span className="text-[10px] font-mono tracking-widest uppercase">Load Track</span>
-          </div>
+          </button>
         )}
       </div>
 
@@ -145,7 +147,9 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
         <div className="col-span-1 flex items-center justify-center">
           <button
             onClick={isPlaying ? controls.pause : controls.play}
-            className={`w-full h-full rounded-xl flex items-center justify-center transition-all shadow-xl border ${
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+            title={isPlaying ? 'Pause' : 'Play'}
+            className={`w-full h-full rounded-xl flex items-center justify-center transition-all shadow-xl border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
               isPlaying
                 ? 'bg-zinc-900 text-red-500 border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
                 : 'bg-zinc-800 text-zinc-400 border-white/5 hover:bg-zinc-700 hover:text-white'
@@ -159,7 +163,9 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
         <div className="col-span-1 flex flex-col gap-2">
           <button
             onClick={() => controls.setPlaybackRate(playbackRate === 1 ? 1.05 : 1)}
-            className={`flex-1 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all ${
+            aria-pressed={playbackRate !== 1}
+            title={playbackRate !== 1 ? 'Disable Sync' : 'Enable Sync'}
+            className={`flex-1 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
               playbackRate !== 1
                 ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
                 : 'bg-zinc-800 border-white/5 text-zinc-500 hover:text-zinc-300'
@@ -170,7 +176,9 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
           </button>
           <button
             onClick={() => controls.toggleLoop(4)}
-            className={`flex-1 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all ${
+            aria-pressed={isLooping}
+            title={isLooping ? 'Disable Loop' : 'Enable Loop'}
+            className={`flex-1 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
               isLooping
                 ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400 animate-pulse'
                 : 'bg-zinc-800 border-white/5 text-zinc-500 hover:text-zinc-300'
@@ -185,18 +193,22 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
         <div className="col-span-2 flex flex-col gap-2">
           <div className="flex gap-2 h-1/2">
             <div className="flex-1 bg-zinc-900/50 rounded-lg border border-white/5 flex flex-col items-center justify-center p-1">
-              <label className="text-[7px] font-bold text-zinc-500 uppercase mb-1">FILTER</label>
+              <label htmlFor={`filter-${id}`} className="text-[7px] font-bold text-zinc-500 uppercase mb-1 cursor-pointer">FILTER</label>
               <input
+                id={`filter-${id}`}
                 type="range" min="20" max="22000" step="100" value={filterFreq}
-                className="w-full h-1 bg-zinc-700 rounded-full appearance-none accent-yellow-500"
+                title="Filter Frequency"
+                className="w-full h-1 bg-zinc-700 rounded-full appearance-none accent-yellow-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 cursor-pointer"
                 onChange={e => controls.setFilter(Number(e.target.value))}
               />
             </div>
             <div className="flex-1 bg-zinc-900/50 rounded-lg border border-white/5 flex flex-col items-center justify-center p-1">
-              <label className="text-[7px] font-bold text-zinc-500 uppercase mb-1">ECHO</label>
+              <label htmlFor={`echo-${id}`} className="text-[7px] font-bold text-zinc-500 uppercase mb-1 cursor-pointer">ECHO</label>
               <input
+                id={`echo-${id}`}
                 type="range" min="0" max="1" step="0.1" value={delayWet}
-                className="w-full h-1 bg-zinc-700 rounded-full appearance-none accent-cyan-500"
+                title="Echo Effect Amount"
+                className="w-full h-1 bg-zinc-700 rounded-full appearance-none accent-cyan-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 cursor-pointer"
                 onChange={e => controls.setDelay(Number(e.target.value))}
               />
             </div>
@@ -206,19 +218,22 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
             {(['high', 'mid', 'low'] as const).map(band => (
               <div key={band} className="h-full flex flex-col items-center justify-center w-8 group/eq">
                 <div className="h-8 w-1 bg-zinc-800 rounded-full relative">
-                  <div
-                    className="absolute w-3 h-2 bg-zinc-500 rounded-sm left-1/2 -translate-x-1/2 shadow-sm transition-all group-hover/eq:bg-white"
-                    style={{ bottom: `${((state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number + 20) / 30) * 100}%` }}
-                  />
                   <input
+                    id={`eq-${band}-${id}`}
                     type="range" min="-20" max="10" step="1"
+                    title={`${band.charAt(0).toUpperCase() + band.slice(1)} EQ`}
+                    aria-label={`${band.charAt(0).toUpperCase() + band.slice(1)} EQ`}
                     value={state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
+                    className="peer absolute inset-0 opacity-0 cursor-pointer z-10"
                     onChange={e => controls.setEQ(band, Number(e.target.value))}
                     onDoubleClick={() => controls.setEQ(band, 0)}
                   />
+                  <div
+                    className="absolute w-3 h-2 bg-zinc-500 rounded-sm left-1/2 -translate-x-1/2 shadow-sm transition-all group-hover/eq:bg-white peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-400"
+                    style={{ bottom: `${((state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number + 20) / 30) * 100}%` }}
+                  />
                 </div>
-                <span className="text-[6px] font-bold text-zinc-600 uppercase mt-1">{band.substring(0, 1)}</span>
+                <label htmlFor={`eq-${band}-${id}`} className="text-[6px] font-bold text-zinc-600 uppercase mt-1 cursor-pointer">{band.substring(0, 1)}</label>
               </div>
             ))}
           </div>
