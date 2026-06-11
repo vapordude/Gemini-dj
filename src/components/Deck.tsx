@@ -95,13 +95,14 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
             </div>
           </>
         ) : (
-          <div
+          <button
             onClick={onLoadTrack}
-            className="w-full h-full border-2 border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center text-zinc-600 hover:border-zinc-600 hover:text-zinc-400 transition-all cursor-pointer group/empty bg-zinc-900/30"
+            aria-label="Load Track"
+            className="w-full h-full border-2 border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center text-zinc-600 hover:border-zinc-600 hover:text-zinc-400 transition-all cursor-pointer group/empty bg-zinc-900/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
           >
             <Disc className="w-12 h-12 mb-3 opacity-20 group-hover/empty:opacity-50 transition-opacity" />
             <span className="text-[10px] font-mono tracking-widest uppercase">Load Track</span>
-          </div>
+          </button>
         )}
       </div>
 
@@ -112,11 +113,28 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
           <span>{formatTime(duration)}</span>
         </div>
         <div
-          className="h-12 bg-zinc-900/80 rounded-lg overflow-hidden relative cursor-pointer border border-white/5 shadow-inner"
+          className="h-12 bg-zinc-900/80 rounded-lg overflow-hidden relative cursor-pointer border border-white/5 shadow-inner focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+          role="slider"
+          tabIndex={0}
+          aria-label="Track Progress"
+          aria-valuenow={progress}
+          aria-valuemin={0}
+          aria-valuemax={100}
           onClick={e => {
             if (!duration) return;
             const rect = e.currentTarget.getBoundingClientRect();
             controls.seek((e.clientX - rect.left) / rect.width * duration);
+          }}
+          onKeyDown={e => {
+            if (!duration) return;
+            const step = duration * 0.05; // 5% step
+            if (e.key === 'ArrowRight') {
+              e.preventDefault();
+              controls.seek(Math.min(duration, currentTime + step));
+            } else if (e.key === 'ArrowLeft') {
+              e.preventDefault();
+              controls.seek(Math.max(0, currentTime - step));
+            }
           }}
         >
           <div className="absolute inset-0 w-full h-full bg-[linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_100%]" />
@@ -206,16 +224,18 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
             {(['high', 'mid', 'low'] as const).map(band => (
               <div key={band} className="h-full flex flex-col items-center justify-center w-8 group/eq">
                 <div className="h-8 w-1 bg-zinc-800 rounded-full relative">
-                  <div
-                    className="absolute w-3 h-2 bg-zinc-500 rounded-sm left-1/2 -translate-x-1/2 shadow-sm transition-all group-hover/eq:bg-white"
-                    style={{ bottom: `${((state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number + 20) / 30) * 100}%` }}
-                  />
                   <input
                     type="range" min="-20" max="10" step="1"
+                    aria-label={`${band.charAt(0).toUpperCase() + band.slice(1)} EQ`}
+                    title={`${band.charAt(0).toUpperCase() + band.slice(1)} EQ`}
                     value={state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
+                    className="peer absolute inset-0 opacity-0 cursor-pointer z-10"
                     onChange={e => controls.setEQ(band, Number(e.target.value))}
                     onDoubleClick={() => controls.setEQ(band, 0)}
+                  />
+                  <div
+                    className="absolute w-3 h-2 bg-zinc-500 rounded-sm left-1/2 -translate-x-1/2 shadow-sm transition-all group-hover/eq:bg-white peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-400 peer-focus-visible:ring-offset-1 peer-focus-visible:ring-offset-zinc-950"
+                    style={{ bottom: `${((state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number + 20) / 30) * 100}%` }}
                   />
                 </div>
                 <span className="text-[6px] font-bold text-zinc-600 uppercase mt-1">{band.substring(0, 1)}</span>
