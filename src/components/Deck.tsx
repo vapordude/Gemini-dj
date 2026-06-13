@@ -95,13 +95,15 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
             </div>
           </>
         ) : (
-          <div
+          <button
             onClick={onLoadTrack}
-            className="w-full h-full border-2 border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center text-zinc-600 hover:border-zinc-600 hover:text-zinc-400 transition-all cursor-pointer group/empty bg-zinc-900/30"
+            aria-label="Load Track"
+            title="Load Track"
+            className="w-full h-full border-2 border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center text-zinc-600 hover:border-zinc-600 hover:text-zinc-400 transition-all cursor-pointer group/empty bg-zinc-900/30 focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none"
           >
             <Disc className="w-12 h-12 mb-3 opacity-20 group-hover/empty:opacity-50 transition-opacity" />
             <span className="text-[10px] font-mono tracking-widest uppercase">Load Track</span>
-          </div>
+          </button>
         )}
       </div>
 
@@ -112,11 +114,28 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
           <span>{formatTime(duration)}</span>
         </div>
         <div
-          className="h-12 bg-zinc-900/80 rounded-lg overflow-hidden relative cursor-pointer border border-white/5 shadow-inner"
+          role="slider"
+          tabIndex={0}
+          aria-valuenow={progress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Seek progress"
+          title="Seek progress"
+          className="h-12 bg-zinc-900/80 rounded-lg overflow-hidden relative cursor-pointer border border-white/5 shadow-inner focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none"
           onClick={e => {
             if (!duration) return;
             const rect = e.currentTarget.getBoundingClientRect();
             controls.seek((e.clientX - rect.left) / rect.width * duration);
+          }}
+          onKeyDown={e => {
+            if (!duration) return;
+            if (e.key === 'ArrowLeft') {
+              e.preventDefault();
+              controls.seek(Math.max(0, currentTime - duration * 0.05));
+            } else if (e.key === 'ArrowRight') {
+              e.preventDefault();
+              controls.seek(Math.min(duration, currentTime + duration * 0.05));
+            }
           }}
         >
           <div className="absolute inset-0 w-full h-full bg-[linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_100%]" />
@@ -145,7 +164,9 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
         <div className="col-span-1 flex items-center justify-center">
           <button
             onClick={isPlaying ? controls.pause : controls.play}
-            className={`w-full h-full rounded-xl flex items-center justify-center transition-all shadow-xl border ${
+            aria-label={isPlaying ? "Pause" : "Play"}
+            title={isPlaying ? "Pause" : "Play"}
+            className={`w-full h-full rounded-xl flex items-center justify-center transition-all shadow-xl border focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none ${
               isPlaying
                 ? 'bg-zinc-900 text-red-500 border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
                 : 'bg-zinc-800 text-zinc-400 border-white/5 hover:bg-zinc-700 hover:text-white'

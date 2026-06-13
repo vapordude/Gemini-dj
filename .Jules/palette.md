@@ -12,3 +12,7 @@
 ## 2024-05-19 - DJChat Accessibility and Interaction Feedback
 **Learning:** Chat UI components need robust keyboard accessibility (focus rings) and aria properties to inform screen readers of their toggle states (`aria-expanded`) and purposes. Furthermore, input submission states must be immediately communicated to the user by disabling both the input and submission buttons while displaying clear tooltips and cursors, thereby preventing accidental multi-submissions when the AI is slow to respond.
 **Action:** Always apply `aria-expanded` and `aria-label`/`title` on chat or modal toggle buttons. Apply `focus-visible:ring-2 focus-visible:outline-none` for keyboard navigation. Always disable form inputs and submit buttons with `disabled:opacity-50` and the appropriate `cursor` classes (`cursor-wait` vs `cursor-not-allowed`) during async loading states.
+
+## 2024-05-18 - Accessible Custom Sliders with Keyboard Support
+**Learning:** Custom UI components that act as sliders (e.g., waveform progress bars built with `div` elements) must not only include `role="slider"`, `tabIndex={0}`, and `aria-value*` attributes, but crucially also need native keyboard event handlers (like `onKeyDown` capturing ArrowLeft/ArrowRight) to be truly accessible to non-mouse users.
+**Action:** When implementing custom `role="slider"` elements, always add an `onKeyDown` handler to support value increments/decrements via arrow keys, alongside standard ARIA attributes and `focus-visible` styling.
