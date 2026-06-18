@@ -95,13 +95,14 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
             </div>
           </>
         ) : (
-          <div
+          <button
             onClick={onLoadTrack}
-            className="w-full h-full border-2 border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center text-zinc-600 hover:border-zinc-600 hover:text-zinc-400 transition-all cursor-pointer group/empty bg-zinc-900/30"
+            aria-label="Load Track"
+            className="w-full h-full border-2 border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center text-zinc-600 hover:border-zinc-600 hover:text-zinc-400 transition-all cursor-pointer group/empty bg-zinc-900/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
           >
             <Disc className="w-12 h-12 mb-3 opacity-20 group-hover/empty:opacity-50 transition-opacity" />
             <span className="text-[10px] font-mono tracking-widest uppercase">Load Track</span>
-          </div>
+          </button>
         )}
       </div>
 
@@ -112,7 +113,22 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
           <span>{formatTime(duration)}</span>
         </div>
         <div
-          className="h-12 bg-zinc-900/80 rounded-lg overflow-hidden relative cursor-pointer border border-white/5 shadow-inner"
+          role="slider"
+          tabIndex={0}
+          aria-valuemin={0}
+          aria-valuemax={duration || 100}
+          aria-valuenow={currentTime}
+          aria-label="Track progress"
+          onKeyDown={e => {
+            if (!duration) return;
+            const step = duration * 0.05; // 5% jump
+            if (e.key === 'ArrowRight') {
+              controls.seek(Math.min(duration, currentTime + step));
+            } else if (e.key === 'ArrowLeft') {
+              controls.seek(Math.max(0, currentTime - step));
+            }
+          }}
+          className="h-12 bg-zinc-900/80 rounded-lg overflow-hidden relative cursor-pointer border border-white/5 shadow-inner focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
           onClick={e => {
             if (!duration) return;
             const rect = e.currentTarget.getBoundingClientRect();
@@ -145,7 +161,9 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
         <div className="col-span-1 flex items-center justify-center">
           <button
             onClick={isPlaying ? controls.pause : controls.play}
-            className={`w-full h-full rounded-xl flex items-center justify-center transition-all shadow-xl border ${
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+            title={isPlaying ? 'Pause' : 'Play'}
+            className={`w-full h-full rounded-xl flex items-center justify-center transition-all shadow-xl border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
               isPlaying
                 ? 'bg-zinc-900 text-red-500 border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
                 : 'bg-zinc-800 text-zinc-400 border-white/5 hover:bg-zinc-700 hover:text-white'
@@ -159,7 +177,9 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
         <div className="col-span-1 flex flex-col gap-2">
           <button
             onClick={() => controls.setPlaybackRate(playbackRate === 1 ? 1.05 : 1)}
-            className={`flex-1 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all ${
+            aria-label="Sync"
+            title="Sync"
+            className={`flex-1 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
               playbackRate !== 1
                 ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
                 : 'bg-zinc-800 border-white/5 text-zinc-500 hover:text-zinc-300'
@@ -170,7 +190,9 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
           </button>
           <button
             onClick={() => controls.toggleLoop(4)}
-            className={`flex-1 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all ${
+            aria-label="Toggle Loop"
+            title="Toggle Loop"
+            className={`flex-1 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
               isLooping
                 ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400 animate-pulse'
                 : 'bg-zinc-800 border-white/5 text-zinc-500 hover:text-zinc-300'
