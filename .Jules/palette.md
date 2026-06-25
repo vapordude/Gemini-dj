@@ -12,3 +12,7 @@
 ## 2024-05-19 - DJChat Accessibility and Interaction Feedback
 **Learning:** Chat UI components need robust keyboard accessibility (focus rings) and aria properties to inform screen readers of their toggle states (`aria-expanded`) and purposes. Furthermore, input submission states must be immediately communicated to the user by disabling both the input and submission buttons while displaying clear tooltips and cursors, thereby preventing accidental multi-submissions when the AI is slow to respond.
 **Action:** Always apply `aria-expanded` and `aria-label`/`title` on chat or modal toggle buttons. Apply `focus-visible:ring-2 focus-visible:outline-none` for keyboard navigation. Always disable form inputs and submit buttons with `disabled:opacity-50` and the appropriate `cursor` classes (`cursor-wait` vs `cursor-not-allowed`) during async loading states.
+
+## 2026-06-24 - Deck Component Accessibility
+**Learning:** Interactive areas built as `div` elements (like dropzones) and icon-only buttons require explicit semantic meaning and ARIA attributes for screen readers, as well as distinct visual feedback for keyboard navigation.
+**Action:** Convert clickable `div`s to `button`s. Always provide unique `aria-label` and `title` tooltips that include the component's identifier (e.g., Deck A). Apply `aria-pressed` to toggle buttons. Use `focus-visible:ring-2` with contextual colors (e.g., indigo vs. purple) for accessible keyboard navigation.
