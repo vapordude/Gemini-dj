@@ -188,7 +188,8 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
               <label className="text-[7px] font-bold text-zinc-500 uppercase mb-1">FILTER</label>
               <input
                 type="range" min="20" max="22000" step="100" value={filterFreq}
-                className="w-full h-1 bg-zinc-700 rounded-full appearance-none accent-yellow-500"
+                aria-label="Filter" title="Filter"
+                className="w-full h-1 bg-zinc-700 rounded-full appearance-none accent-yellow-500 focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:outline-none"
                 onChange={e => controls.setFilter(Number(e.target.value))}
               />
             </div>
@@ -196,7 +197,8 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
               <label className="text-[7px] font-bold text-zinc-500 uppercase mb-1">ECHO</label>
               <input
                 type="range" min="0" max="1" step="0.1" value={delayWet}
-                className="w-full h-1 bg-zinc-700 rounded-full appearance-none accent-cyan-500"
+                aria-label="Echo" title="Echo"
+                className="w-full h-1 bg-zinc-700 rounded-full appearance-none accent-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none"
                 onChange={e => controls.setDelay(Number(e.target.value))}
               />
             </div>
@@ -206,16 +208,17 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
             {(['high', 'mid', 'low'] as const).map(band => (
               <div key={band} className="h-full flex flex-col items-center justify-center w-8 group/eq">
                 <div className="h-8 w-1 bg-zinc-800 rounded-full relative">
-                  <div
-                    className="absolute w-3 h-2 bg-zinc-500 rounded-sm left-1/2 -translate-x-1/2 shadow-sm transition-all group-hover/eq:bg-white"
-                    style={{ bottom: `${((state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number + 20) / 30) * 100}%` }}
-                  />
                   <input
                     type="range" min="-20" max="10" step="1"
                     value={state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
+                    aria-label={`${band} EQ`} title={`${band} EQ`}
+                    className="peer z-10 absolute inset-0 opacity-0 cursor-pointer"
                     onChange={e => controls.setEQ(band, Number(e.target.value))}
                     onDoubleClick={() => controls.setEQ(band, 0)}
+                  />
+                  <div
+                    className={`absolute w-3 h-2 bg-zinc-500 rounded-sm left-1/2 -translate-x-1/2 shadow-sm transition-all group-hover/eq:bg-white peer-focus-visible:ring-2 ${isDeckA ? 'peer-focus-visible:ring-indigo-400' : 'peer-focus-visible:ring-purple-400'}`}
+                    style={{ bottom: `${((state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number + 20) / 30) * 100}%` }}
                   />
                 </div>
                 <span className="text-[6px] font-bold text-zinc-600 uppercase mt-1">{band.substring(0, 1)}</span>
