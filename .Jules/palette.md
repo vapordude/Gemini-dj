@@ -12,3 +12,7 @@
 ## 2024-05-19 - DJChat Accessibility and Interaction Feedback
 **Learning:** Chat UI components need robust keyboard accessibility (focus rings) and aria properties to inform screen readers of their toggle states (`aria-expanded`) and purposes. Furthermore, input submission states must be immediately communicated to the user by disabling both the input and submission buttons while displaying clear tooltips and cursors, thereby preventing accidental multi-submissions when the AI is slow to respond.
 **Action:** Always apply `aria-expanded` and `aria-label`/`title` on chat or modal toggle buttons. Apply `focus-visible:ring-2 focus-visible:outline-none` for keyboard navigation. Always disable form inputs and submit buttons with `disabled:opacity-50` and the appropriate `cursor` classes (`cursor-wait` vs `cursor-not-allowed`) during async loading states.
+
+## 2024-05-19 - Accessible Hidden Inputs
+**Learning:** Visually hidden native inputs (`opacity-0`), commonly used for custom sliders or crossfaders, lose visible focus indicators for keyboard users.
+**Action:** Always use Tailwind's `peer` class on the hidden `<input>` and style the adjacent visible sibling with `peer-focus-visible` (e.g., `peer-focus-visible:ring-2`). The DOM order is critical: the `<input className="peer">` must precede its styled sibling, and may require `z-10` to receive pointer events. Always pair this with `aria-label` and `title`.
