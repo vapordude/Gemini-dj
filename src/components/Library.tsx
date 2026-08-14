@@ -99,13 +99,15 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
           <div className="flex items-center justify-between mb-4 px-2">
             <button
               onClick={() => setSelectedPlaylist(null)}
-              className="flex items-center gap-2 text-[10px] text-zinc-400 hover:text-white uppercase tracking-wider font-bold"
+              title="Go Back"
+              className="flex items-center gap-2 text-[10px] text-zinc-400 hover:text-white uppercase tracking-wider font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded px-1"
             >
               <ChevronLeft size={12} /> Back
             </button>
             <button
               onClick={() => onQueueTracks(playlistTracks)}
-              className="flex items-center gap-2 px-3 py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-[10px] font-bold rounded-full transition-colors border border-indigo-500/30"
+              title="Play All Tracks"
+              className="flex items-center gap-2 px-3 py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-[10px] font-bold rounded-full transition-colors border border-indigo-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
             >
               <PlayCircle size={12} /> PLAY ALL
             </button>
@@ -124,7 +126,8 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
             <div className="flex justify-end mb-2 px-2">
               <button
                 onClick={() => onQueueTracks(results)}
-                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider"
+                title="Queue All Tracks"
+                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded px-1"
               >
                 QUEUE ALL
               </button>
@@ -176,7 +179,8 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
                   }));
                   onQueueTracks(tracks);
                 }}
-                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider"
+                title="Queue All Tracks"
+                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded px-1"
               >
                 QUEUE ALL
               </button>
