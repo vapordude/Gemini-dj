@@ -112,11 +112,27 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
           <span>{formatTime(duration)}</span>
         </div>
         <div
-          className="h-12 bg-zinc-900/80 rounded-lg overflow-hidden relative cursor-pointer border border-white/5 shadow-inner"
+          role="slider"
+          tabIndex={0}
+          aria-label={`Track progress for Deck ${isDeckA ? 'A' : 'B'}`}
+          aria-valuenow={progress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          className={`h-12 bg-zinc-900/80 rounded-lg overflow-hidden relative cursor-pointer border border-white/5 shadow-inner focus-visible:outline-none focus-visible:ring-2 ${isDeckA ? 'focus-visible:ring-indigo-400' : 'focus-visible:ring-purple-400'}`}
           onClick={e => {
             if (!duration) return;
             const rect = e.currentTarget.getBoundingClientRect();
             controls.seek((e.clientX - rect.left) / rect.width * duration);
+          }}
+          onKeyDown={e => {
+            if (!duration) return;
+            if (e.key === 'ArrowLeft') {
+              e.preventDefault();
+              controls.seek(Math.max(0, currentTime - 5));
+            } else if (e.key === 'ArrowRight') {
+              e.preventDefault();
+              controls.seek(Math.min(duration, currentTime + 5));
+            }
           }}
         >
           <div className="absolute inset-0 w-full h-full bg-[linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_100%]" />
@@ -188,7 +204,9 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
               <label className="text-[7px] font-bold text-zinc-500 uppercase mb-1">FILTER</label>
               <input
                 type="range" min="20" max="22000" step="100" value={filterFreq}
-                className="w-full h-1 bg-zinc-700 rounded-full appearance-none accent-yellow-500"
+                aria-label={`Filter for Deck ${isDeckA ? 'A' : 'B'}`}
+                title="Filter"
+                className={`w-full h-1 bg-zinc-700 rounded-full appearance-none accent-yellow-500 focus-visible:outline-none focus-visible:ring-2 ${isDeckA ? 'focus-visible:ring-indigo-400' : 'focus-visible:ring-purple-400'}`}
                 onChange={e => controls.setFilter(Number(e.target.value))}
               />
             </div>
@@ -196,7 +214,9 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
               <label className="text-[7px] font-bold text-zinc-500 uppercase mb-1">ECHO</label>
               <input
                 type="range" min="0" max="1" step="0.1" value={delayWet}
-                className="w-full h-1 bg-zinc-700 rounded-full appearance-none accent-cyan-500"
+                aria-label={`Echo for Deck ${isDeckA ? 'A' : 'B'}`}
+                title="Echo"
+                className={`w-full h-1 bg-zinc-700 rounded-full appearance-none accent-cyan-500 focus-visible:outline-none focus-visible:ring-2 ${isDeckA ? 'focus-visible:ring-indigo-400' : 'focus-visible:ring-purple-400'}`}
                 onChange={e => controls.setDelay(Number(e.target.value))}
               />
             </div>
@@ -206,16 +226,18 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
             {(['high', 'mid', 'low'] as const).map(band => (
               <div key={band} className="h-full flex flex-col items-center justify-center w-8 group/eq">
                 <div className="h-8 w-1 bg-zinc-800 rounded-full relative">
-                  <div
-                    className="absolute w-3 h-2 bg-zinc-500 rounded-sm left-1/2 -translate-x-1/2 shadow-sm transition-all group-hover/eq:bg-white"
-                    style={{ bottom: `${((state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number + 20) / 30) * 100}%` }}
-                  />
                   <input
                     type="range" min="-20" max="10" step="1"
                     value={state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
+                    aria-label={`EQ ${band} for Deck ${isDeckA ? 'A' : 'B'}`}
+                    title={`EQ ${band}`}
+                    className="peer absolute inset-0 opacity-0 cursor-pointer z-10"
                     onChange={e => controls.setEQ(band, Number(e.target.value))}
                     onDoubleClick={() => controls.setEQ(band, 0)}
+                  />
+                  <div
+                    className={`absolute w-3 h-2 bg-zinc-500 rounded-sm left-1/2 -translate-x-1/2 shadow-sm transition-all group-hover/eq:bg-white peer-focus-visible:ring-2 peer-focus-visible:outline-none ${isDeckA ? 'peer-focus-visible:ring-indigo-400' : 'peer-focus-visible:ring-purple-400'}`}
+                    style={{ bottom: `${((state[`eq${band.charAt(0).toUpperCase() + band.slice(1)}` as keyof DeckState] as number + 20) / 30) * 100}%` }}
                   />
                 </div>
                 <span className="text-[6px] font-bold text-zinc-600 uppercase mt-1">{band.substring(0, 1)}</span>
