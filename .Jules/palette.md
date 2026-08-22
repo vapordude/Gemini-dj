@@ -12,3 +12,6 @@
 ## 2024-05-19 - DJChat Accessibility and Interaction Feedback
 **Learning:** Chat UI components need robust keyboard accessibility (focus rings) and aria properties to inform screen readers of their toggle states (`aria-expanded`) and purposes. Furthermore, input submission states must be immediately communicated to the user by disabling both the input and submission buttons while displaying clear tooltips and cursors, thereby preventing accidental multi-submissions when the AI is slow to respond.
 **Action:** Always apply `aria-expanded` and `aria-label`/`title` on chat or modal toggle buttons. Apply `focus-visible:ring-2 focus-visible:outline-none` for keyboard navigation. Always disable form inputs and submit buttons with `disabled:opacity-50` and the appropriate `cursor` classes (`cursor-wait` vs `cursor-not-allowed`) during async loading states.
+## 2025-02-18 - Load Track Empty State Accessibility
+**Learning:** Visually empty state areas that act as interactive actions (e.g., 'Load Track' dropzones or placeholders) should be built using semantic `<button>` elements rather than `div` elements to natively support keyboard focus management and screen readers.
+**Action:** Always use semantic buttons with appropriate `aria-label`, `title`, and `focus-visible` utility classes for interactive empty states across the application.
