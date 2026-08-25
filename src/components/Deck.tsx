@@ -112,11 +112,28 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
           <span>{formatTime(duration)}</span>
         </div>
         <div
-          className="h-12 bg-zinc-900/80 rounded-lg overflow-hidden relative cursor-pointer border border-white/5 shadow-inner"
+          role="slider"
+          tabIndex={0}
+          aria-valuenow={currentTime}
+          aria-valuemin={0}
+          aria-valuemax={duration || 100}
+          aria-label={`Track position for Deck ${id}`}
+          className={`h-12 bg-zinc-900/80 rounded-lg overflow-hidden relative cursor-pointer border border-white/5 shadow-inner focus-visible:outline-none focus-visible:ring-2 ${isDeckA ? 'focus-visible:ring-indigo-400' : 'focus-visible:ring-purple-400'}`}
           onClick={e => {
             if (!duration) return;
             const rect = e.currentTarget.getBoundingClientRect();
             controls.seek((e.clientX - rect.left) / rect.width * duration);
+          }}
+          onKeyDown={e => {
+            if (!duration) return;
+            const step = duration * 0.05; // 5% step
+            if (e.key === 'ArrowRight') {
+              e.preventDefault();
+              controls.seek(Math.min(duration, currentTime + step));
+            } else if (e.key === 'ArrowLeft') {
+              e.preventDefault();
+              controls.seek(Math.max(0, currentTime - step));
+            }
           }}
         >
           <div className="absolute inset-0 w-full h-full bg-[linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_100%]" />
