@@ -12,3 +12,7 @@
 ## 2024-05-19 - DJChat Accessibility and Interaction Feedback
 **Learning:** Chat UI components need robust keyboard accessibility (focus rings) and aria properties to inform screen readers of their toggle states (`aria-expanded`) and purposes. Furthermore, input submission states must be immediately communicated to the user by disabling both the input and submission buttons while displaying clear tooltips and cursors, thereby preventing accidental multi-submissions when the AI is slow to respond.
 **Action:** Always apply `aria-expanded` and `aria-label`/`title` on chat or modal toggle buttons. Apply `focus-visible:ring-2 focus-visible:outline-none` for keyboard navigation. Always disable form inputs and submit buttons with `disabled:opacity-50` and the appropriate `cursor` classes (`cursor-wait` vs `cursor-not-allowed`) during async loading states.
+
+## 2025-02-27 - Contextual ARIA labels for repeated components
+**Learning:** When using repeated components (like Deck A/B), icon-only buttons need contextual dynamic ARIA labels (e.g., 'Play Deck A') and focus rings to ensure screen readers can easily distinguish between them.
+**Action:** Always interpolate unique component identifiers into ARIA labels and focus styles for duplicated interface sections.
