@@ -95,13 +95,15 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
             </div>
           </>
         ) : (
-          <div
+          <button
             onClick={onLoadTrack}
-            className="w-full h-full border-2 border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center text-zinc-600 hover:border-zinc-600 hover:text-zinc-400 transition-all cursor-pointer group/empty bg-zinc-900/30"
+            aria-label={`Load Track into Deck ${id}`}
+            title={`Load Track into Deck ${id}`}
+            className={`w-full h-full border-2 border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center text-zinc-600 hover:border-zinc-600 hover:text-zinc-400 transition-all cursor-pointer group/empty bg-zinc-900/30 focus-visible:outline-none focus-visible:ring-2 ${isDeckA ? 'focus-visible:ring-indigo-400' : 'focus-visible:ring-purple-400'}`}
           >
             <Disc className="w-12 h-12 mb-3 opacity-20 group-hover/empty:opacity-50 transition-opacity" />
             <span className="text-[10px] font-mono tracking-widest uppercase">Load Track</span>
-          </div>
+          </button>
         )}
       </div>
 
