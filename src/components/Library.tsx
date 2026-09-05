@@ -99,13 +99,17 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
           <div className="flex items-center justify-between mb-4 px-2">
             <button
               onClick={() => setSelectedPlaylist(null)}
-              className="flex items-center gap-2 text-[10px] text-zinc-400 hover:text-white uppercase tracking-wider font-bold"
+              aria-label="Back to playlists"
+              title="Back to playlists"
+              className="flex items-center gap-2 text-[10px] text-zinc-400 hover:text-white uppercase tracking-wider font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded px-1"
             >
               <ChevronLeft size={12} /> Back
             </button>
             <button
               onClick={() => onQueueTracks(playlistTracks)}
-              className="flex items-center gap-2 px-3 py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-[10px] font-bold rounded-full transition-colors border border-indigo-500/30"
+              aria-label="Play all tracks in playlist"
+              title="Play all tracks in playlist"
+              className="flex items-center gap-2 px-3 py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-[10px] font-bold rounded-full transition-colors border border-indigo-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
             >
               <PlayCircle size={12} /> PLAY ALL
             </button>
@@ -124,7 +128,9 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
             <div className="flex justify-end mb-2 px-2">
               <button
                 onClick={() => onQueueTracks(results)}
-                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider"
+                aria-label="Queue all search results"
+                title="Queue all search results"
+                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded px-1"
               >
                 QUEUE ALL
               </button>
@@ -143,10 +149,11 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
       case 'playlists':
         return playlists.length > 0 ? (
           playlists.map((playlist: any) => (
-            <div
+            <button
               key={playlist.playlistId}
-              className="group flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/5"
+              className="group flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/5 w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
               onClick={() => fetchPlaylistTracks(playlist.playlistId)}
+              aria-label={`View playlist ${playlist.name}`}
             >
               <div className="w-10 h-10 rounded bg-zinc-800 overflow-hidden shadow-lg">
                 <img src={playlist.thumbnails?.[0]?.url} alt={playlist.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
@@ -155,7 +162,7 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
                 <h4 className="text-xs font-bold text-zinc-300 group-hover:text-white truncate">{playlist.name}</h4>
                 <p className="text-[10px] text-zinc-500 truncate font-mono">{playlist.count || 0} TRACKS</p>
               </div>
-            </div>
+            </button>
           ))
         ) : (
           <EmptyState icon={List} label="NO PLAYLISTS" />
@@ -176,7 +183,9 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
                   }));
                   onQueueTracks(tracks);
                 }}
-                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider"
+                aria-label="Queue all songs"
+                title="Queue all songs"
+                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded px-1"
               >
                 QUEUE ALL
               </button>
@@ -202,14 +211,14 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
       case 'artists':
         return artists.length > 0 ? (
           artists.map((artist: any) => (
-            <div key={artist.artistId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/5 group">
+            <button key={artist.artistId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/5 group w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400" aria-label={`View artist ${artist.name}`}>
               <div className="w-10 h-10 rounded-full bg-zinc-800 overflow-hidden shadow-lg border border-white/5">
                 <img src={artist.thumbnails?.[0]?.url} alt={artist.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-xs font-bold text-zinc-300 group-hover:text-white truncate">{artist.name}</h4>
               </div>
-            </div>
+            </button>
           ))
         ) : (
           <EmptyState icon={User} label="NO ARTISTS" />
@@ -236,7 +245,8 @@ export function Library({ onLoadTrack, onQueueTracks }: LibraryProps) {
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="SEARCH DATABASE..."
-              className="w-full bg-zinc-950/50 border border-white/10 rounded-lg pl-9 pr-4 py-1.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:bg-zinc-900 transition-all font-mono"
+              className="w-full bg-zinc-950/50 border border-white/10 rounded-lg pl-9 pr-4 py-1.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:bg-zinc-900 transition-all font-mono"
+              aria-label="Search library"
             />
           </form>
         </div>
@@ -273,9 +283,11 @@ interface TrackItemProps {
 }
 
 const TrackItem: React.FC<TrackItemProps> = ({ track, onLoadTrack }) => (
-  <div
-    className="group flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/5"
+  <button
+    className="group flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/5 w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
     onClick={() => onLoadTrack(track)}
+    aria-label={`Load track ${track.title} by ${track.artist}`}
+    title={`Load track ${track.title} by ${track.artist}`}
   >
     <div className="relative w-10 h-10 rounded overflow-hidden flex-shrink-0 bg-zinc-800 shadow-md">
       <img src={track.thumbnail} alt={track.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
@@ -292,7 +304,7 @@ const TrackItem: React.FC<TrackItemProps> = ({ track, onLoadTrack }) => (
         ? `${Math.floor(track.duration / 60)}:${Math.floor(track.duration % 60).toString().padStart(2, '0')}`
         : track.duration}
     </div>
-  </div>
+  </button>
 );
 
 function EmptyState({ icon: Icon, label }: { icon: any; label: string }) {

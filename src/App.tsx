@@ -84,7 +84,7 @@ export default function App() {
             onClick={() => setAutoDJ(!autoDJ)}
             aria-pressed={autoDJ}
             title={autoDJ ? 'Turn Auto DJ Off' : 'Turn Auto DJ On'}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all border ${
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
               autoDJ
                 ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300 shadow-[0_0_15px_rgba(99,102,241,0.3)]'
                 : 'bg-zinc-800 border-white/10 text-zinc-400 hover:bg-zinc-700'
@@ -98,7 +98,7 @@ export default function App() {
             onClick={triggerManualTransition}
             disabled={generating || !deckA.state.track || !deckB.state.track}
             title={generating ? 'Generating transition...' : (!deckA.state.track || !deckB.state.track) ? 'Need tracks on both decks to transition' : 'Trigger manual transition'}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all ${
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-medium text-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
               generating
                 ? 'bg-zinc-800 text-zinc-500 cursor-wait'
                 : (!deckA.state.track || !deckB.state.track)
