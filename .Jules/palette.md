@@ -12,3 +12,9 @@
 ## 2024-05-19 - DJChat Accessibility and Interaction Feedback
 **Learning:** Chat UI components need robust keyboard accessibility (focus rings) and aria properties to inform screen readers of their toggle states (`aria-expanded`) and purposes. Furthermore, input submission states must be immediately communicated to the user by disabling both the input and submission buttons while displaying clear tooltips and cursors, thereby preventing accidental multi-submissions when the AI is slow to respond.
 **Action:** Always apply `aria-expanded` and `aria-label`/`title` on chat or modal toggle buttons. Apply `focus-visible:ring-2 focus-visible:outline-none` for keyboard navigation. Always disable form inputs and submit buttons with `disabled:opacity-50` and the appropriate `cursor` classes (`cursor-wait` vs `cursor-not-allowed`) during async loading states.
+## 2026-09-09 - Context-Aware Focus Rings in Repeated Components
+**Learning:** When adding focus rings () to components instantiated multiple times (like Deck A and Deck B), generic focus colors can feel disjointed from the component's established thematic identity.
+**Action:** Use contextual data (e.g., `isDeckA`) to apply dynamic tailwind utility classes for focus states (e.g., `focus-visible:ring-indigo-400` vs `purple-400`) to ensure accessibility enhancements natively blend with the visual hierarchy.
+## 2026-09-09 - Context-Aware Focus Rings in Repeated Components
+**Learning:** When adding focus rings (`focus-visible:ring-2`) to components instantiated multiple times (like Deck A and Deck B), generic focus colors can feel disjointed from the component's established thematic identity.
+**Action:** Use contextual data (e.g., `isDeckA`) to apply dynamic tailwind utility classes for focus states (e.g., `focus-visible:ring-indigo-400` vs `purple-400`) to ensure accessibility enhancements natively blend with the visual hierarchy.
