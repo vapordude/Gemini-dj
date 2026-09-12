@@ -12,3 +12,7 @@
 ## 2024-05-19 - DJChat Accessibility and Interaction Feedback
 **Learning:** Chat UI components need robust keyboard accessibility (focus rings) and aria properties to inform screen readers of their toggle states (`aria-expanded`) and purposes. Furthermore, input submission states must be immediately communicated to the user by disabling both the input and submission buttons while displaying clear tooltips and cursors, thereby preventing accidental multi-submissions when the AI is slow to respond.
 **Action:** Always apply `aria-expanded` and `aria-label`/`title` on chat or modal toggle buttons. Apply `focus-visible:ring-2 focus-visible:outline-none` for keyboard navigation. Always disable form inputs and submit buttons with `disabled:opacity-50` and the appropriate `cursor` classes (`cursor-wait` vs `cursor-not-allowed`) during async loading states.
+
+## 2025-02-28 - Accessible Custom Range Sliders with Tailwind Peer
+**Learning:** When styling custom UI over native `<input type="range">` elements, adding `opacity-0` hides the input but removes visual keyboard focus rings.
+**Action:** Always maintain the DOM order where the `<input type="range" className="peer z-10 ...">` precedes the visual custom thumb `<div className="peer-focus-visible:ring-2 ...">`. This ensures the native input remains accessible and visually communicates keyboard focus to the custom adjacent element.
