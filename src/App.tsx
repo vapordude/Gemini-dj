@@ -5,12 +5,14 @@ import { Library } from './components/Library';
 import { Visualizer } from './components/Visualizer';
 import { useAudioDeck, Track } from './hooks/useAudioDeck';
 import { useAutoDJ } from './hooks/useAutoDJ';
-import { Mic, Sparkles, Zap } from './components/Icons';
+import { Mic, Sparkles, Zap, Settings } from './components/Icons';
 import { DJChat } from './components/DJChat';
 
 export default function App() {
   const [crossfader, setCrossfader] = useState(0.5);
   const [queue, setQueue] = useState<Track[]>([]);
+  const [showSettings, setShowSettings] = useState(false);
+  const [apiKeys, setApiKeys] = useState({ gemini: localStorage.getItem('gemini_api_key') || '' });
 
   const deckA = useAudioDeck(1.0);
   const deckB = useAudioDeck(0.0);
@@ -116,6 +118,15 @@ export default function App() {
             )}
           </button>
         </div>
+
+          <button
+            onClick={() => setShowSettings(true)}
+            title="Settings"
+            className="p-1.5 rounded-full bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors border border-white/10"
+          >
+            <Settings size={18} />
+          </button>
+
       </header>
 
       {/* Main Workspace */}
@@ -172,6 +183,53 @@ export default function App() {
       </main>
 
       <DJChat onCommand={handleDJCommand} />
+
+      {showSettings && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 w-[400px] shadow-2xl flex flex-col gap-4">
+            <h2 className="text-xl font-bold font-mono neon-text flex items-center gap-2">
+              <Settings size={20} />
+              SYSTEM SETTINGS
+            </h2>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-zinc-400 font-mono">GEMINI API KEY</label>
+              <input
+                type="password"
+                value={apiKeys.gemini}
+                onChange={(e) => setApiKeys(prev => ({...prev, gemini: e.target.value}))}
+                placeholder="AIza..."
+                className="bg-zinc-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:bg-zinc-900 transition-all font-mono shadow-inner"
+              />
+              <p className="text-[10px] text-zinc-500">Required for DJ Voice (TTS), Track Analysis & DJ Chat.</p>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-2">
+              <button
+                onClick={() => setShowSettings(false)}
+                className="px-4 py-2 rounded-xl text-xs font-medium text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+              >
+                CANCEL
+              </button>
+              <button
+                onClick={() => {
+                  localStorage.setItem('gemini_api_key', apiKeys.gemini);
+                  fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ geminiKey: apiKeys.gemini })
+                  });
+                  setShowSettings(false);
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-500/20"
+              >
+                SAVE & APPLY
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
