@@ -15,3 +15,7 @@
 ## 2026-09-13 - Convert empty states to buttons
 **Learning:** Visually empty state areas that act as interactive actions (e.g., 'Load Track' dropzones or placeholders) should be built using semantic `<button>` elements rather than `<div onClick>` elements to natively support keyboard focus management and screen readers.
 **Action:** When auditing custom interactive elements, always verify if a `div` with an `onClick` handler can be semantically replaced by a `button`, applying necessary `aria-label`, `title`, and context-specific `focus-visible` styles.
+
+## 2026-10-25 - Custom Slider Accessibility with Tailwind Peer
+**Learning:** When creating custom range sliders using a hidden `<input type="range">` and a styled sibling element for the thumb/track, standard CSS hover/focus doesn't natively bubble to siblings without specific class setups. Screen readers can focus the hidden input, but visual keyboard users won't see focus styles on the customized component.
+**Action:** Use Tailwind's `peer` class on the hidden `<input type="range" className="peer">` and `peer-focus-visible:ring-*` on the visible styled element. Critically, the DOM order must place the input *before* the styled sibling for `peer` to work, and the input may require `z-10` to receive pointer events if it shares the exact layout space as the sibling.
