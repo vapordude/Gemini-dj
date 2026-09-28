@@ -12,7 +12,7 @@ const app = express();
 const PORT = 3000;
 
 // Initialize Gemini AI
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 // Initialize YTMusic API
 const ytmusic = new YTMusic();
@@ -350,6 +350,24 @@ apiRouter.post('/dj/speech', async (req, res) => {
   } catch (error) {
     console.error('DJ Speech error:', error);
     res.status(500).json({ error: 'Failed to generate speech' });
+  }
+});
+
+
+// Settings API
+apiRouter.post('/settings', (req, res) => {
+  const { geminiKey } = req.body;
+  if (geminiKey) {
+    process.env.GEMINI_API_KEY = geminiKey;
+    // Re-initialize Gemini AI with new key if possible.
+    // The GoogleGenAI SDK doesn't easily support hot-swapping keys on the same instance,
+    // but in many wrappers we could re-instantiate it. For now, since `ai` is a global const,
+    // we'll update the env var and ideally recreate `ai`.
+    // Let's replace the global `ai` variable with a let.
+    ai = new GoogleGenAI({ apiKey: geminiKey });
+    res.json({ success: true });
+  } else {
+    res.status(400).json({ error: 'No key provided' });
   }
 });
 

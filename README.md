@@ -18,3 +18,13 @@ View your app in AI Studio: https://ai.studio/apps/5fd74bda-6d78-4ab9-98df-7f629
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+## Configuration
+
+This app allows you to configure your API keys directly from the UI.
+Click the settings (gear) icon in the top right corner of the header to open the settings modal.
+Here you can enter your `GEMINI_API_KEY`, which is required for:
+- DJ Voice (Text-to-Speech)
+- Track Analysis (BPM, Key, Energy)
+- DJ Chat Assistant
+
+You can also set this via the `.env.local` file or through the AI Studio secrets panel.
