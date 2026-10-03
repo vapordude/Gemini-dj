@@ -132,8 +132,8 @@ apiRouter.get('/library/artists', async (req, res) => {
 apiRouter.get('/playlist/:id', async (req, res) => {
   try {
     const playlistId = req.params.id;
-    if (!playlistId) {
-      return res.status(400).json({ error: 'Missing playlistId' });
+    if (!playlistId || !/^[a-zA-Z0-9_-]{2,64}$/.test(playlistId)) {
+      return res.status(400).json({ error: 'Invalid or missing playlistId' });
     }
     
     // Use ytmusic-api to get playlist videos
@@ -199,8 +199,8 @@ apiRouter.get('/search', async (req, res) => {
 apiRouter.get('/stream/:videoId', async (req, res) => {
   try {
     const videoId = req.params.videoId;
-    if (!videoId) {
-      return res.status(400).json({ error: 'Missing videoId' });
+    if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+      return res.status(400).json({ error: 'Invalid or missing videoId' });
     }
 
     // Pipe the stream directly to the client
