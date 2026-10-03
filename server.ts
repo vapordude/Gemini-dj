@@ -8,7 +8,7 @@ import { Readable } from 'stream';
 
 import YTMusic from 'ytmusic-api';
 
-const app = express();
+export const app = express();
 const PORT = 3000;
 
 // Initialize Gemini AI
@@ -16,13 +16,13 @@ let ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 // Initialize YTMusic API
 const ytmusic = new YTMusic();
-let isYTMusicInitialized = false;
+export const state = { isYTMusicInitialized: false };
 
 async function initYTMusic() {
   if (process.env.YTMUSIC_COOKIE) {
     try {
       await ytmusic.initialize({ cookies: process.env.YTMUSIC_COOKIE });
-      isYTMusicInitialized = true;
+      state.isYTMusicInitialized = true;
       console.log('YTMusic API initialized with user cookie.');
     } catch (error) {
       console.error('Failed to initialize YTMusic API:', error);
@@ -37,7 +37,7 @@ async function initYTMusic() {
   }
 }
 
-initYTMusic();
+if (process.env.NODE_ENV !== "test") { initYTMusic(); }
 
 app.use(express.json());
 
@@ -48,7 +48,7 @@ const apiRouter = express.Router();
 
 // Library: Playlists
 apiRouter.get('/library/playlists', async (req, res) => {
-  if (!isYTMusicInitialized) {
+  if (!state.isYTMusicInitialized) {
     return res.status(503).json({ error: 'YTMusic API not initialized' });
   }
   try {
@@ -71,7 +71,7 @@ apiRouter.get('/library/playlists', async (req, res) => {
 
 // Library: Songs (Liked/Library)
 apiRouter.get('/library/songs', async (req, res) => {
-    if (!isYTMusicInitialized) {
+    if (!state.isYTMusicInitialized) {
       return res.status(503).json({ error: 'YTMusic API not initialized' });
     }
     try {
@@ -107,7 +107,7 @@ apiRouter.get('/library/songs', async (req, res) => {
 
 // Library: Artists
 apiRouter.get('/library/artists', async (req, res) => {
-    if (!isYTMusicInitialized) {
+    if (!state.isYTMusicInitialized) {
       return res.status(503).json({ error: 'YTMusic API not initialized' });
     }
     try {
@@ -392,4 +392,4 @@ async function startServer() {
   });
 }
 
-startServer();
+if (process.env.NODE_ENV !== "test") { startServer(); }
