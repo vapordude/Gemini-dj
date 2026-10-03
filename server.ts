@@ -11,6 +11,21 @@ import YTMusic from 'ytmusic-api';
 const app = express();
 const PORT = 3000;
 
+// Security Constants
+const MAX_SPEECH_TEXT = 1000;
+const MAX_CHAT_MESSAGE = 2000;
+const MAX_TRACK_METADATA = 250;
+const MAX_VIBE_TEXT = 500;
+
+// Sanitization helper
+const sanitizeInput = (input: string | undefined, maxLength: number): string => {
+  if (!input) return '';
+  return input
+    .slice(0, maxLength)
+    .replace(/["\n\r[\]{}]/g, '') // Strip quotes, newlines, and brackets
+    .trim();
+};
+
 // Initialize Gemini AI
 let ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -229,11 +244,14 @@ apiRouter.post('/chat', async (req, res) => {
             return res.status(400).json({ error: 'Missing message' });
         }
 
+        const trimmedMessage = message.slice(0, MAX_CHAT_MESSAGE);
+        const trimmedSystemInstruction = systemInstruction ? systemInstruction.slice(0, MAX_CHAT_MESSAGE) : undefined;
+
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
-            contents: message,
+            contents: trimmedMessage,
             config: {
-                systemInstruction: systemInstruction,
+                systemInstruction: trimmedSystemInstruction,
             }
         });
 
@@ -253,8 +271,11 @@ apiRouter.post('/analyze-track', async (req, res) => {
       return res.status(400).json({ error: 'Missing title or artist' });
     }
 
+    const sanitizedTitle = sanitizeInput(title, MAX_TRACK_METADATA);
+    const sanitizedArtist = sanitizeInput(artist, MAX_TRACK_METADATA);
+
     const prompt = `
-      Analyze the track "${title}" by "${artist}".
+      Analyze the track "${sanitizedTitle}" by "${sanitizedArtist}".
       Estimate the following musical properties based on your knowledge of the song:
       1. BPM (Beats Per Minute) - integer
       2. Key (e.g., C Minor, F# Major)
@@ -293,11 +314,17 @@ apiRouter.post('/dj/commentary', async (req, res) => {
   try {
     const { currentTrack, nextTrack, vibe } = req.body;
     
+    const sanitizedCurrentTitle = currentTrack?.title ? sanitizeInput(currentTrack.title, MAX_TRACK_METADATA) : 'Unknown';
+    const sanitizedCurrentArtist = currentTrack?.artist ? sanitizeInput(currentTrack.artist, MAX_TRACK_METADATA) : 'Unknown';
+    const sanitizedNextTitle = nextTrack?.title ? sanitizeInput(nextTrack.title, MAX_TRACK_METADATA) : 'Unknown';
+    const sanitizedNextArtist = nextTrack?.artist ? sanitizeInput(nextTrack.artist, MAX_TRACK_METADATA) : 'Unknown';
+    const sanitizedVibe = vibe ? sanitizeInput(vibe, MAX_VIBE_TEXT) : 'energetic and smooth';
+
     const prompt = `
       You are a world-class radio DJ.
-      Current track: "${currentTrack.title}" by ${currentTrack.artist}.
-      Next track: "${nextTrack.title}" by ${nextTrack.artist}.
-      Vibe: ${vibe || 'energetic and smooth'}.
+      Current track: "${sanitizedCurrentTitle}" by ${sanitizedCurrentArtist}.
+      Next track: "${sanitizedNextTitle}" by ${sanitizedNextArtist}.
+      Vibe: ${sanitizedVibe}.
       
       Generate a short, punchy, and engaging transition script (max 2 sentences) to introduce the next track.
       Do not include "DJ:" or any script markers. Just the spoken text.
@@ -324,10 +351,12 @@ apiRouter.post('/dj/speech', async (req, res) => {
       return res.status(400).json({ error: 'Missing text' });
     }
 
+    const trimmedText = text.slice(0, MAX_SPEECH_TEXT);
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-preview-tts',
       contents: {
-        parts: [{ text }],
+        parts: [{ text: trimmedText }],
       },
       config: {
         responseModalities: ['AUDIO'],
