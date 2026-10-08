@@ -1,0 +1,3 @@
+## 2025-02-26 - Prevention of YTMusic API Cache Stampede
+**Learning:** The `ytmusic.getHomeSections()` API call was identified as a bottleneck, particularly because concurrent requests (e.g., from `/library/playlists`, `/library/songs`, and `/library/artists`) would all hit the YouTube Music API simultaneously. This can lead to a "cache stampede" or excessive load.
+**Action:** Implemented a TTL cache and deduped in-flight requests using a shared promise (`inflightHomeSectionsPromise`). Next time, proactively look for opportunities to deduplicate and cache expensive remote API calls that are likely to be requested simultaneously by multiple clients or parallel endpoints.
