@@ -1,0 +1,3 @@
+## 2025-02-27 - Backend Cache Stampede Prevention
+**Learning:** In scenarios where an application acts as a proxy to an upstream API (like `ytmusic-api`), exposing multiple concurrent endpoints (e.g. `library/playlists`, `library/songs`, `library/artists`) that trigger the same upstream query without caching can cause "cache stampedes" on page load.
+**Action:** Always implement simple promise-based in-flight request deduplication for expensive or shared proxy calls, capturing the promise to return it to subsequent callers until resolution, to drastically reduce the load on external systems during concurrent fetches.
