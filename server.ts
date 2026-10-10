@@ -39,6 +39,30 @@ async function initYTMusic() {
 
 initYTMusic();
 
+let cachedHomeSections: any = null;
+let cachedHomeSectionsTime: number = 0;
+let inflightHomeSectionsPromise: Promise<any> | null = null;
+const CACHE_TTL = 1000 * 60 * 5; // 5 minutes
+
+async function getCachedHomeSections() {
+  if (cachedHomeSections && Date.now() - cachedHomeSectionsTime < CACHE_TTL) {
+    return cachedHomeSections;
+  }
+  if (inflightHomeSectionsPromise) {
+    return inflightHomeSectionsPromise;
+  }
+  inflightHomeSectionsPromise = ytmusic.getHomeSections().then(res => {
+    cachedHomeSections = res;
+    cachedHomeSectionsTime = Date.now();
+    inflightHomeSectionsPromise = null;
+    return res;
+  }).catch(err => {
+    inflightHomeSectionsPromise = null;
+    throw err;
+  });
+  return inflightHomeSectionsPromise;
+}
+
 app.use(express.json());
 
 // API Routes
@@ -54,7 +78,7 @@ apiRouter.get('/library/playlists', async (req, res) => {
   try {
     if (process.env.YTMUSIC_COOKIE) {
         // Use Home Sections as a proxy for "Library" since specific endpoints aren't exposed
-        const home = await ytmusic.getHomeSections();
+        const home = await getCachedHomeSections();
         // Filter for sections that contain playlists
         const playlists = home.flatMap((section: any) => 
             (section.contents || []).filter((item: any) => item.type === 'PLAYLIST')
@@ -90,7 +114,7 @@ apiRouter.get('/library/songs', async (req, res) => {
             res.json({ songs });
           } catch (e) {
              console.warn("Failed to fetch LM playlist, falling back to home sections songs", e);
-             const home = await ytmusic.getHomeSections();
+             const home = await getCachedHomeSections();
              const songs = home.flatMap((section: any) => 
                 (section.contents || []).filter((item: any) => item.type === 'SONG')
              );
@@ -113,7 +137,7 @@ apiRouter.get('/library/artists', async (req, res) => {
     try {
       if (process.env.YTMUSIC_COOKIE) {
           // Use Home Sections
-          const home = await ytmusic.getHomeSections();
+          const home = await getCachedHomeSections();
           const artists = home.flatMap((section: any) => 
             (section.contents || []).filter((item: any) => item.type === 'ARTIST')
           );
