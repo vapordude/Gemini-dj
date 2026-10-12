@@ -1,0 +1,3 @@
+## 2026-10-12 - Cached and Deduplicated YTMusic API Calls
+**Learning:** Initializing multiple independent components that simultaneously fetch identical heavy resources (like YouTube Music Home Sections for Playlists, Artists, and Songs) without caching causes a 'stampeding herd' of redundant backend requests, increasing latency and API rate-limiting risks.
+**Action:** Always wrap concurrent, identical expensive operations (like remote API calls on app startup) in an active-promise deduplication cache using an `inflightPromise` tracking variable and time-based Time-To-Live (TTL) cache to serve subsequent identical requests immediately from memory.
