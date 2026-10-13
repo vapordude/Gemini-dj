@@ -1,0 +1,3 @@
+## 2025-02-23 - Prevented Cache Stampede in ytmusic API Calls
+**Learning:** The application was making simultaneous calls to `getHomeSections()` from `/library/playlists`, `/library/songs`, and `/library/artists` routes when the frontend library component mounted. Without deduplication, this resulted in 3x the necessary API calls because the data fetching wasn't complete before the next request started.
+**Action:** Implemented an `inflightHomeSectionsPromise` variable along with a short-lived cache (5 mins) in `server.ts` to ensure that concurrent requests wait for a single API response rather than launching their own duplicate requests. Always look out for concurrent requests triggered by UI components mounting.
