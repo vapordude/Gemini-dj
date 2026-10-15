@@ -1,0 +1,3 @@
+## 2025-02-13 - [Preventing Cache Stampedes in Backend Calls]
+**Learning:** The `ytmusic.getHomeSections()` function in `server.ts` was being called simultaneously by multiple endpoints (like `/library/playlists`, `/library/songs`, and `/library/artists`) during app initialization. Since this function is used as a proxy for the library endpoints due to API limitations, concurrent requests caused multiple expensive network calls to the underlying YTMusic API.
+**Action:** Implementing a global cache with a deduping promise (`inflightHomeSectionsPromise`) alongside a short TTL (like 5 minutes) ensures that multiple simultaneous callers wait for the same single API response. Apply this pattern to any expensive, globally queried data structure during initialization.
