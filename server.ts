@@ -46,6 +46,39 @@ const apiRouter = express.Router();
 
 // ... (existing routes)
 
+// ⚡ Bolt Performance Optimization: Prevent Cache Stampedes
+// ytmusic.getHomeSections() is slow and called concurrently when the client loads Library data.
+// We cache the result for 5 minutes and use an inflight promise to deduplicate concurrent requests.
+// This reduces redundant API calls to YTMusic and speeds up initial library loads.
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+let homeSectionsCache: any = null;
+let homeSectionsCacheTime: number = 0;
+let inflightHomeSectionsPromise: Promise<any> | null = null;
+
+async function getCachedHomeSections() {
+  const now = Date.now();
+  if (homeSectionsCache && now - homeSectionsCacheTime < CACHE_TTL) {
+    return homeSectionsCache;
+  }
+
+  if (inflightHomeSectionsPromise) {
+    return inflightHomeSectionsPromise;
+  }
+
+  inflightHomeSectionsPromise = ytmusic.getHomeSections().then((data) => {
+    homeSectionsCache = data;
+    homeSectionsCacheTime = Date.now();
+    inflightHomeSectionsPromise = null;
+    return data;
+  }).catch((err) => {
+    inflightHomeSectionsPromise = null;
+    throw err;
+  });
+
+  return inflightHomeSectionsPromise;
+}
+
+
 // Library: Playlists
 apiRouter.get('/library/playlists', async (req, res) => {
   if (!isYTMusicInitialized) {
@@ -54,7 +87,7 @@ apiRouter.get('/library/playlists', async (req, res) => {
   try {
     if (process.env.YTMUSIC_COOKIE) {
         // Use Home Sections as a proxy for "Library" since specific endpoints aren't exposed
-        const home = await ytmusic.getHomeSections();
+        const home = await getCachedHomeSections();
         // Filter for sections that contain playlists
         const playlists = home.flatMap((section: any) => 
             (section.contents || []).filter((item: any) => item.type === 'PLAYLIST')
@@ -90,7 +123,7 @@ apiRouter.get('/library/songs', async (req, res) => {
             res.json({ songs });
           } catch (e) {
              console.warn("Failed to fetch LM playlist, falling back to home sections songs", e);
-             const home = await ytmusic.getHomeSections();
+             const home = await getCachedHomeSections();
              const songs = home.flatMap((section: any) => 
                 (section.contents || []).filter((item: any) => item.type === 'SONG')
              );
@@ -113,7 +146,7 @@ apiRouter.get('/library/artists', async (req, res) => {
     try {
       if (process.env.YTMUSIC_COOKIE) {
           // Use Home Sections
-          const home = await ytmusic.getHomeSections();
+          const home = await getCachedHomeSections();
           const artists = home.flatMap((section: any) => 
             (section.contents || []).filter((item: any) => item.type === 'ARTIST')
           );
