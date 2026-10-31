@@ -158,25 +158,30 @@ export function useAutoDJ({ deckA, deckB, crossfader, setCrossfader, queue, setQ
   };
 
   // Auto DJ Loop
+  // ⚡ Bolt: Removed currentTime from dependency array to prevent constant re-renders. We poll audioRef instead.
   useEffect(() => {
     if (!autoDJ || queue.length === 0 || isTransitioning) return;
 
-    const activeDeck = crossfader < 0.5 ? deckA : deckB;
-    const inactiveDeck = crossfader < 0.5 ? deckB : deckA;
+    const interval = setInterval(() => {
+      const activeDeck = crossfader < 0.5 ? deckA : deckB;
+      const inactiveDeck = crossfader < 0.5 ? deckB : deckA;
 
-    // If active deck is playing and nearing end (e.g., 20s left)
-    if (activeDeck.state.isPlaying && activeDeck.state.duration > 0) {
-      const timeRemaining = activeDeck.state.duration - activeDeck.state.currentTime;
-      
-      if (timeRemaining < 20 && !transitionRef.current) {
-        performAutoTransition(activeDeck, inactiveDeck);
+      // If active deck is playing and nearing end (e.g., 20s left)
+      if (activeDeck.state.isPlaying && activeDeck.state.duration > 0 && activeDeck.audioRef.current) {
+        const timeRemaining = activeDeck.state.duration - activeDeck.audioRef.current.currentTime;
+
+        if (timeRemaining < 20 && !transitionRef.current) {
+          performAutoTransition(activeDeck, inactiveDeck);
+        }
       }
-    }
-    // If active deck stopped but we have queue, start next
-    else if (!activeDeck.state.isPlaying && !transitionRef.current && queue.length > 0) {
-        performAutoTransition(activeDeck, inactiveDeck, true);
-    }
-  }, [autoDJ, queue, deckA.state.currentTime, deckB.state.currentTime, isTransitioning, crossfader]);
+      // If active deck stopped but we have queue, start next
+      else if (!activeDeck.state.isPlaying && !transitionRef.current && queue.length > 0) {
+          performAutoTransition(activeDeck, inactiveDeck, true);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [autoDJ, queue, isTransitioning, crossfader, deckA, deckB]);
 
   const triggerManualTransition = () => {
       const activeDeck = crossfader < 0.5 ? deckA : deckB;
