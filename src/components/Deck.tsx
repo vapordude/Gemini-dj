@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Pause, Disc, Activity, Repeat, Zap } from './Icons';
 import { DeckState } from '../hooks/useAudioDeck';
 
@@ -10,7 +10,21 @@ interface DeckProps {
 }
 
 export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
-  const { isPlaying, currentTime, duration, track, filterFreq, delayWet, playbackRate, isLooping } = state;
+  const { isPlaying, duration, track, filterFreq, delayWet, playbackRate, isLooping } = state;
+  // ⚡ Bolt: Use local state for currentTime and poll it to avoid cascading App re-renders
+  const [currentTime, setCurrentTime] = useState(0);
+
+  useEffect(() => {
+    let reqId: number;
+    const pollTime = () => {
+      if (controls.audioRef?.current) {
+        setCurrentTime(controls.audioRef.current.currentTime);
+      }
+      reqId = requestAnimationFrame(pollTime);
+    };
+    reqId = requestAnimationFrame(pollTime);
+    return () => cancelAnimationFrame(reqId);
+  }, [controls.audioRef]);
 
   const formatTime = (time: number) => {
     const mins = Math.floor(time / 60);
