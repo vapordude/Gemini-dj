@@ -164,19 +164,29 @@ export function useAutoDJ({ deckA, deckB, crossfader, setCrossfader, queue, setQ
     const activeDeck = crossfader < 0.5 ? deckA : deckB;
     const inactiveDeck = crossfader < 0.5 ? deckB : deckA;
 
-    // If active deck is playing and nearing end (e.g., 20s left)
-    if (activeDeck.state.isPlaying && activeDeck.state.duration > 0) {
-      const timeRemaining = activeDeck.state.duration - activeDeck.state.currentTime;
+    // Use setInterval to poll currentTime directly from audioRef instead of
+    // depending on frequent state updates, heavily optimizing performance.
+    const pollInterval = setInterval(() => {
+      if (!activeDeck.audioRef?.current) return;
+      const audio = activeDeck.audioRef.current;
       
-      if (timeRemaining < 20 && !transitionRef.current) {
-        performAutoTransition(activeDeck, inactiveDeck);
+      // If active deck is playing and nearing end (e.g., 20s left)
+      // We read paused and duration from the audio element directly to avoid stale closures
+      if (!audio.paused && audio.duration > 0) {
+        const timeRemaining = audio.duration - audio.currentTime;
+
+        if (timeRemaining < 20 && !transitionRef.current) {
+          performAutoTransition(activeDeck, inactiveDeck);
+        }
       }
-    }
-    // If active deck stopped but we have queue, start next
-    else if (!activeDeck.state.isPlaying && !transitionRef.current && queue.length > 0) {
-        performAutoTransition(activeDeck, inactiveDeck, true);
-    }
-  }, [autoDJ, queue, deckA.state.currentTime, deckB.state.currentTime, isTransitioning, crossfader]);
+      // If active deck stopped but we have queue, start next
+      else if (audio.paused && !transitionRef.current && queue.length > 0) {
+          performAutoTransition(activeDeck, inactiveDeck, true);
+      }
+    }, 1000);
+
+    return () => clearInterval(pollInterval);
+  }, [autoDJ, queue, isTransitioning, crossfader, deckA, deckB]);
 
   const triggerManualTransition = () => {
       const activeDeck = crossfader < 0.5 ? deckA : deckB;

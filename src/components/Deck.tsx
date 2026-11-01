@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Pause, Disc, Activity, Repeat, Zap } from './Icons';
 import { DeckState } from '../hooks/useAudioDeck';
 
@@ -10,7 +10,47 @@ interface DeckProps {
 }
 
 export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
-  const { isPlaying, currentTime, duration, track, filterFreq, delayWet, playbackRate, isLooping } = state;
+  const { isPlaying, duration, track, filterFreq, delayWet, playbackRate, isLooping } = state;
+  const [currentTime, setCurrentTime] = useState(0);
+
+  // Use requestAnimationFrame to locally track currentTime during playback.
+  // This prevents cascading O(N) app re-renders from high-frequency timeupdate events
+  // previously fired from the useAudioDeck top-level hook.
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const updateTime = () => {
+      if (controls.audioRef.current) {
+        setCurrentTime(controls.audioRef.current.currentTime);
+      }
+      if (isPlaying) {
+        animationFrameId = requestAnimationFrame(updateTime);
+      }
+    };
+
+    if (isPlaying) {
+      animationFrameId = requestAnimationFrame(updateTime);
+    } else {
+      // Run once immediately if not playing (e.g. after a seek while paused)
+      updateTime();
+    }
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [isPlaying, controls.audioRef]);
+
+  // Sync currentTime if track changes or is scrubbed while paused
+  useEffect(() => {
+    if (!isPlaying && controls.audioRef.current) {
+      const handleTimeUpdate = () => setCurrentTime(controls.audioRef.current.currentTime);
+      controls.audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
+      return () => controls.audioRef.current?.removeEventListener('timeupdate', handleTimeUpdate);
+    }
+  }, [isPlaying, controls.audioRef]);
+
 
   const formatTime = (time: number) => {
     const mins = Math.floor(time / 60);
@@ -118,7 +158,9 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
           onClick={e => {
             if (!duration) return;
             const rect = e.currentTarget.getBoundingClientRect();
-            controls.seek((e.clientX - rect.left) / rect.width * duration);
+            const newTime = (e.clientX - rect.left) / rect.width * duration;
+            controls.seek(newTime);
+            setCurrentTime(newTime);
           }}
         >
           <div className="absolute inset-0 w-full h-full bg-[linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_100%]" />
