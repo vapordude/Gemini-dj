@@ -17,7 +17,6 @@ export interface Track {
 export interface DeckState {
   isPlaying: boolean;
   volume: number;
-  currentTime: number;
   duration: number;
   track: Track | null;
   filterFreq: number;
@@ -36,7 +35,6 @@ export function useAudioDeck(initialVolume = 1.0) {
   const [state, setState] = useState<DeckState>({
     isPlaying: false,
     volume: initialVolume,
-    currentTime: 0,
     duration: 0,
     track: null,
     filterFreq: 22000,
@@ -130,16 +128,16 @@ export function useAudioDeck(initialVolume = 1.0) {
 
     const audio = audioRef.current;
 
-    const onTimeUpdate = () => setState(prev => ({ ...prev, currentTime: audio.currentTime }));
     const onDurationChange = () => setState(prev => ({ ...prev, duration: audio.duration }));
     const onEnded = () => setState(prev => ({ ...prev, isPlaying: false }));
 
-    audio.addEventListener('timeupdate', onTimeUpdate);
+    // ⚡ Bolt Performance Optimization: Removed timeupdate event listener here
+    // to prevent cascading re-renders across the app. Components that need
+    // the current time should poll audioRef directly.
     audio.addEventListener('durationchange', onDurationChange);
     audio.addEventListener('ended', onEnded);
 
     return () => {
-      audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('durationchange', onDurationChange);
       audio.removeEventListener('ended', onEnded);
     };
@@ -194,7 +192,6 @@ export function useAudioDeck(initialVolume = 1.0) {
       ...prev,
       track: analyzedTrack,
       isPlaying: false,
-      currentTime: 0,
       playbackRate: 1.0,
       isLooping: false,
       loopStart: null,
@@ -227,7 +224,6 @@ export function useAudioDeck(initialVolume = 1.0) {
   const seek = (time: number) => {
     if (audioRef.current) {
       audioRef.current.currentTime = time;
-      setState(prev => ({ ...prev, currentTime: time }));
     }
   };
 
@@ -351,8 +347,14 @@ export function useAudioDeck(initialVolume = 1.0) {
     }
   };
 
+  const getCurrentTime = () => {
+    return audioRef.current ? audioRef.current.currentTime : 0;
+  };
+
   return {
     state,
+    audioRef,
+    getCurrentTime,
     loadTrack,
     play,
     pause,

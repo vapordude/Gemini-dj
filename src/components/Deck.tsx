@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Pause, Disc, Activity, Repeat, Zap } from './Icons';
 import { DeckState } from '../hooks/useAudioDeck';
 
@@ -10,7 +10,51 @@ interface DeckProps {
 }
 
 export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
-  const { isPlaying, currentTime, duration, track, filterFreq, delayWet, playbackRate, isLooping } = state;
+  const { isPlaying, duration, track, filterFreq, delayWet, playbackRate, isLooping } = state;
+  const [currentTime, setCurrentTime] = useState(0);
+
+  // ⚡ Bolt Performance Optimization: Poll audio currentTime locally using
+  // requestAnimationFrame to avoid triggering global App re-renders.
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const updateTime = () => {
+      if (controls.getCurrentTime) {
+        setCurrentTime(controls.getCurrentTime());
+      }
+      if (isPlaying) {
+        animationFrameId = requestAnimationFrame(updateTime);
+      }
+    };
+
+    if (isPlaying) {
+      animationFrameId = requestAnimationFrame(updateTime);
+    } else if (controls.getCurrentTime) {
+      setCurrentTime(controls.getCurrentTime());
+    }
+
+    const handleTimeUpdate = () => {
+      if (!isPlaying && controls.getCurrentTime) {
+        setCurrentTime(controls.getCurrentTime());
+      }
+    };
+
+    const audioEl = controls.audioRef?.current;
+    if (audioEl) {
+      audioEl.addEventListener('timeupdate', handleTimeUpdate);
+      audioEl.addEventListener('seeked', handleTimeUpdate);
+    }
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      if (audioEl) {
+        audioEl.removeEventListener('timeupdate', handleTimeUpdate);
+        audioEl.removeEventListener('seeked', handleTimeUpdate);
+      }
+    };
+  }, [isPlaying, controls]);
 
   const formatTime = (time: number) => {
     const mins = Math.floor(time / 60);

@@ -158,25 +158,39 @@ export function useAutoDJ({ deckA, deckB, crossfader, setCrossfader, queue, setQ
   };
 
   // Auto DJ Loop
+  // ⚡ Bolt Performance Optimization: Polling the audio elements directly with setInterval
+  // instead of depending on `deck.state.currentTime` which causes global re-renders.
   useEffect(() => {
     if (!autoDJ || queue.length === 0 || isTransitioning) return;
 
-    const activeDeck = crossfader < 0.5 ? deckA : deckB;
-    const inactiveDeck = crossfader < 0.5 ? deckB : deckA;
+    const checkAutoDJ = () => {
+      const activeDeck = crossfader < 0.5 ? deckA : deckB;
+      const inactiveDeck = crossfader < 0.5 ? deckB : deckA;
 
-    // If active deck is playing and nearing end (e.g., 20s left)
-    if (activeDeck.state.isPlaying && activeDeck.state.duration > 0) {
-      const timeRemaining = activeDeck.state.duration - activeDeck.state.currentTime;
-      
-      if (timeRemaining < 20 && !transitionRef.current) {
-        performAutoTransition(activeDeck, inactiveDeck);
+      const audio = activeDeck.audioRef?.current;
+      if (!audio) return;
+
+      const isPlaying = !audio.paused;
+      const duration = audio.duration;
+      const currentTime = audio.currentTime;
+
+      // If active deck is playing and nearing end (e.g., 20s left)
+      if (isPlaying && duration > 0) {
+        const timeRemaining = duration - currentTime;
+
+        if (timeRemaining < 20 && !transitionRef.current) {
+          performAutoTransition(activeDeck, inactiveDeck);
+        }
       }
-    }
-    // If active deck stopped but we have queue, start next
-    else if (!activeDeck.state.isPlaying && !transitionRef.current && queue.length > 0) {
-        performAutoTransition(activeDeck, inactiveDeck, true);
-    }
-  }, [autoDJ, queue, deckA.state.currentTime, deckB.state.currentTime, isTransitioning, crossfader]);
+      // If active deck stopped but we have queue, start next
+      else if (!isPlaying && !transitionRef.current && queue.length > 0) {
+          performAutoTransition(activeDeck, inactiveDeck, true);
+      }
+    };
+
+    const intervalId = setInterval(checkAutoDJ, 1000);
+    return () => clearInterval(intervalId);
+  }, [autoDJ, queue, deckA, deckB, isTransitioning, crossfader]);
 
   const triggerManualTransition = () => {
       const activeDeck = crossfader < 0.5 ? deckA : deckB;
