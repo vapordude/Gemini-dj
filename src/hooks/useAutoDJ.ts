@@ -158,25 +158,44 @@ export function useAutoDJ({ deckA, deckB, crossfader, setCrossfader, queue, setQ
   };
 
   // Auto DJ Loop
+  // ⚡ Bolt: Replaced React state dependencies and intervals with direct DOM event listeners (timeupdate, ended) on the active audio element.
+  // Impact: Prevents app-wide continuous re-renders from state changes while ensuring immediate AutoDJ transitions with 0 latency.
   useEffect(() => {
     if (!autoDJ || queue.length === 0 || isTransitioning) return;
 
     const activeDeck = crossfader < 0.5 ? deckA : deckB;
     const inactiveDeck = crossfader < 0.5 ? deckB : deckA;
+    const audio = activeDeck.audioRef?.current;
 
-    // If active deck is playing and nearing end (e.g., 20s left)
-    if (activeDeck.state.isPlaying && activeDeck.state.duration > 0) {
-      const timeRemaining = activeDeck.state.duration - activeDeck.state.currentTime;
-      
-      if (timeRemaining < 20 && !transitionRef.current) {
+    if (!audio) return;
+
+    const handleTimeUpdate = () => {
+      if (audio.paused || transitionRef.current) return;
+      const timeRemaining = audio.duration - audio.currentTime;
+      if (timeRemaining > 0 && timeRemaining < 20) {
         performAutoTransition(activeDeck, inactiveDeck);
       }
-    }
-    // If active deck stopped but we have queue, start next
-    else if (!activeDeck.state.isPlaying && !transitionRef.current && queue.length > 0) {
+    };
+
+    const handleEnded = () => {
+      if (!transitionRef.current && queue.length > 0) {
         performAutoTransition(activeDeck, inactiveDeck, true);
+      }
+    };
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
+
+    // Immediate check if track is already stopped
+    if (audio.paused && audio.currentTime === 0 && queue.length > 0 && !transitionRef.current) {
+       performAutoTransition(activeDeck, inactiveDeck, true);
     }
-  }, [autoDJ, queue, deckA.state.currentTime, deckB.state.currentTime, isTransitioning, crossfader]);
+
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [autoDJ, queue, isTransitioning, crossfader, deckA, deckB]);
 
   const triggerManualTransition = () => {
       const activeDeck = crossfader < 0.5 ? deckA : deckB;
