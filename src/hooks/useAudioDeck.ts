@@ -17,7 +17,6 @@ export interface Track {
 export interface DeckState {
   isPlaying: boolean;
   volume: number;
-  currentTime: number;
   duration: number;
   track: Track | null;
   filterFreq: number;
@@ -33,10 +32,11 @@ export interface DeckState {
 }
 
 export function useAudioDeck(initialVolume = 1.0) {
+  // Performance Optimization: `currentTime` removed from state to avoid global re-renders
+  // since `useAudioDeck` is instantiated at the top level (`App.tsx`).
   const [state, setState] = useState<DeckState>({
     isPlaying: false,
     volume: initialVolume,
-    currentTime: 0,
     duration: 0,
     track: null,
     filterFreq: 22000,
@@ -52,6 +52,11 @@ export function useAudioDeck(initialVolume = 1.0) {
   });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  if (typeof window !== 'undefined' && !audioRef.current) {
+    audioRef.current = new Audio();
+    audioRef.current.crossOrigin = 'anonymous';
+  }
+
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const eqLowRef = useRef<BiquadFilterNode | null>(null);
@@ -123,23 +128,16 @@ export function useAudioDeck(initialVolume = 1.0) {
 
   // Set up audio element and event listeners once on mount
   useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.crossOrigin = 'anonymous';
-    }
-
     const audio = audioRef.current;
+    if (!audio) return;
 
-    const onTimeUpdate = () => setState(prev => ({ ...prev, currentTime: audio.currentTime }));
     const onDurationChange = () => setState(prev => ({ ...prev, duration: audio.duration }));
     const onEnded = () => setState(prev => ({ ...prev, isPlaying: false }));
 
-    audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('durationchange', onDurationChange);
     audio.addEventListener('ended', onEnded);
 
     return () => {
-      audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('durationchange', onDurationChange);
       audio.removeEventListener('ended', onEnded);
     };
@@ -162,11 +160,6 @@ export function useAudioDeck(initialVolume = 1.0) {
   }, [state.isLooping, state.loopStart, state.loopLength]);
 
   const loadTrack = async (track: Track) => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.crossOrigin = 'anonymous';
-    }
-
     engine.init();
     engine.resume();
     initNodes();
@@ -194,7 +187,6 @@ export function useAudioDeck(initialVolume = 1.0) {
       ...prev,
       track: analyzedTrack,
       isPlaying: false,
-      currentTime: 0,
       playbackRate: 1.0,
       isLooping: false,
       loopStart: null,
@@ -227,7 +219,6 @@ export function useAudioDeck(initialVolume = 1.0) {
   const seek = (time: number) => {
     if (audioRef.current) {
       audioRef.current.currentTime = time;
-      setState(prev => ({ ...prev, currentTime: time }));
     }
   };
 
@@ -352,6 +343,7 @@ export function useAudioDeck(initialVolume = 1.0) {
   };
 
   return {
+    audioRef,
     state,
     loadTrack,
     play,

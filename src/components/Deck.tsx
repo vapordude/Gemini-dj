@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Pause, Disc, Activity, Repeat, Zap } from './Icons';
 import { DeckState } from '../hooks/useAudioDeck';
 
@@ -10,7 +10,24 @@ interface DeckProps {
 }
 
 export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
-  const { isPlaying, currentTime, duration, track, filterFreq, delayWet, playbackRate, isLooping } = state;
+  const { isPlaying, duration, track, filterFreq, delayWet, playbackRate, isLooping } = state;
+  const [localCurrentTime, setLocalCurrentTime] = useState(0);
+
+  // Performance Optimization: Maintain `currentTime` locally instead of in the root `useAudioDeck` hook
+  // to avoid triggering global re-renders on every `timeupdate`.
+  useEffect(() => {
+    const audio = controls.audioRef?.current;
+    if (!audio) return;
+
+    const updateTime = () => setLocalCurrentTime(audio.currentTime);
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('seeked', updateTime);
+
+    return () => {
+      audio.removeEventListener('timeupdate', updateTime);
+      audio.removeEventListener('seeked', updateTime);
+    };
+  }, [controls.audioRef]);
 
   const formatTime = (time: number) => {
     const mins = Math.floor(time / 60);
@@ -18,7 +35,7 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
     return `${mins}:${secs}`;
   };
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const progress = duration > 0 ? (localCurrentTime / duration) * 100 : 0;
   const isDeckA = id === 'A';
   const accentColor = isDeckA ? 'text-indigo-400' : 'text-purple-400';
   const accentBorder = isDeckA ? 'border-indigo-500/30' : 'border-purple-500/30';
@@ -110,7 +127,7 @@ export function Deck({ id, state, controls, onLoadTrack }: DeckProps) {
       {/* Waveform / Progress */}
       <div className="mb-4 relative z-10">
         <div className="flex justify-between text-[10px] font-mono text-zinc-500 mb-1 tracking-wider">
-          <span className={isPlaying ? 'text-white' : ''}>{formatTime(currentTime)}</span>
+          <span className={isPlaying ? 'text-white' : ''}>{formatTime(localCurrentTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>
         <div
